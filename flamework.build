@@ -1,0 +1,14 @@
+{
+	"version": 1,
+	"flameworkVersion": "1.0.0-beta.15",
+	"identifiers": {
+		"Roblox-TS-Template:out/server/services/PlayerDataService@PlayerDataService": "server/services/PlayerDataService@PlayerDataService",
+		"Roblox-TS-Template:out/shared/network@GlobalEvents": "shared/network@GlobalEvents",
+		"Roblox-TS-Template:out/shared/network@GlobalFunctions": "shared/network@GlobalFunctions",
+		"Roblox-TS-Template:out/client/controllers/TestController@TestController": "client/controllers/TestController@TestController",
+		"Roblox-TS-Template:out/client/ui/apps/Settings@SettingsApp": "client/ui/apps/Settings@SettingsApp",
+		"Roblox-TS-Template:out/client/ui/components/Settings/SettingFrame@SettingsFrame": "client/ui/components/Settings/SettingFrame@SettingsFrame",
+		"Roblox-TS-Template:out/client/controllers/SettingsController@SettingsController": "client/controllers/SettingsController@SettingsController"
+	},
+	"metadata": {}
+}
