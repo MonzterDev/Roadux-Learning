@@ -5,15 +5,7 @@ import { PlayerData } from "shared/types/PlayerData";
 import { DataActions, dataReducer, DataState } from "./reducers";
 import { PlayerDataKeys } from "shared/types/Rodux";
 
-export interface CombinedState {
-	data: DataState;
-}
-
-const combinedReducer = combineReducers<CombinedState, DataActions>({
-	data: dataReducer,
-});
-
-export const clientStore = new Store(combinedReducer);
+export const clientStore = new Store(dataReducer);
 export type ClientStore = typeof clientStore;
 
 Events.replicatePlayerState.connect((action) => {

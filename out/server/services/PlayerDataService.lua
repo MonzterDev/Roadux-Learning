@@ -3,9 +3,7 @@ local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_incl
 local Reflect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Reflect
 local Service = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Service
 local ProfileService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "profileservice", "src")
-local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
-local HttpService = _services.HttpService
-local Players = _services.Players
+local HttpService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").HttpService
 local _network = TS.import(script, game:GetService("ServerScriptService"), "TS", "network")
 local Events = _network.Events
 local Functions = _network.Functions
@@ -52,22 +50,7 @@ do
 			end
 			return _condition
 		end)
-		task.spawn(function()
-			while 1 + 1 == 2 do
-				local _exp = Players:GetPlayers()
-				local _arg0 = function(player)
-					print(true)
-					local profile = self:getProfile(player)
-					if profile then
-						profile.adjustTaps(1)
-					end
-				end
-				for _k, _v in _exp do
-					_arg0(_v, _k - 1, _exp)
-				end
-				task.wait(1)
-			end
-		end)
+		task.spawn(function() end)
 	end
 	function PlayerDataService:createProfile(player)
 		local userId = player.UserId

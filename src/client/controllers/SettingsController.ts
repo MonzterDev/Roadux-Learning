@@ -2,6 +2,7 @@ import { Controller, OnStart } from "@flamework/core";
 import { createElement, mount } from "@rbxts/roact";
 import Roact from "@rbxts/roact";
 import { withHookDetection } from "@rbxts/roact-hooked";
+import RoactRodux from "@rbxts/roact-rodux";
 import { Players } from "@rbxts/services";
 import { clientStore } from "client/rodux/rodux";
 import { SettingsApp } from "client/ui/apps/Settings";
@@ -13,7 +14,10 @@ export class SettingsController implements OnStart {
 
 	onStart() {
 		withHookDetection(Roact);
-		mount(createElement(SettingsApp), this.playerGui);
+		mount(
+			createElement(RoactRodux.StoreProvider, { store: clientStore }, [createElement(SettingsApp)]),
+			this.playerGui,
+		);
 
 		clientStore.changed.connect((newState) => print(newState));
 	}

@@ -1,31 +1,24 @@
 import Roact from "@rbxts/roact";
-import { useEffect, useState } from "@rbxts/roact-hooked";
-import { ClientStore, clientStore } from "client/rodux/rodux";
+import RoactRodux from "@rbxts/roact-rodux";
+import Rodux from "@rbxts/rodux";
+import { PlayerState, UpdateSettingAction } from "client/rodux/reducers";
+import { clientStore } from "client/rodux/rodux";
 import { Setting } from "shared/constants/Settings";
 import { PlayerDataKeys } from "shared/types/Rodux";
-import { UpdateSettingAction } from "client/rodux/reducers";
 
-// Uses roact-hooked
+// Uses roact-rodux
 
-interface Props {
-	setting: Setting;
+interface StateProps {
+	readonly setting: Setting;
+	readonly isEnabled: boolean;
 }
 
-function SettingsFrame(props: Props) {
-	const [isEnabled, setIsEnabled] = useState(() => {
-		const currentState = clientStore.getState();
-		return currentState.settings[props.setting as keyof typeof currentState.settings];
-	});
+interface UIProps extends StateProps {}
 
-	const toggleEnabled = () => {
-		setIsEnabled((action) => !action);
-		const action: UpdateSettingAction = {
-			type: PlayerDataKeys.updateSetting,
-			setting: props.setting,
-			value: !isEnabled,
-		};
-		clientStore.dispatch(action);
-	};
+interface UIState {}
+
+function SettingsFrame2(props: StateProps) {
+	const isEnabled = props.isEnabled;
 
 	return (
 		<frame BackgroundColor3={Color3.fromRGB(64, 64, 64)}>
@@ -54,7 +47,14 @@ function SettingsFrame(props: Props) {
 				Size={UDim2.fromScale(0.075, 0.3)}
 				BackgroundColor3={isEnabled ? new Color3(0.13, 0.92, 0.17) : new Color3(0.92, 0.13, 0.13)}
 				Event={{
-					MouseButton1Click: toggleEnabled,
+					MouseButton1Click: () => {
+						const action: UpdateSettingAction = {
+							type: PlayerDataKeys.updateSetting,
+							setting: props.setting,
+							value: !isEnabled,
+						};
+						clientStore.dispatch(action);
+					},
 				}}
 			>
 				<uicorner CornerRadius={new UDim(0.3, 0)} />
@@ -63,4 +63,12 @@ function SettingsFrame(props: Props) {
 	);
 }
 
-export default SettingsFrame;
+function mapState(state: PlayerState, props: StateProps) {
+	return {
+		isEnabled: state.settings[props.setting as keyof typeof state.settings],
+	};
+}
+
+function mapDispatch(dispatch: Rodux.Dispatch, props: StateProps) {}
+
+export default RoactRodux.connect(mapState, mapDispatch)(SettingsFrame2);

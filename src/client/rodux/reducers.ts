@@ -48,3 +48,4 @@ export const dataReducer = createReducer<DataState, DataActions>(DEFAULT_PLAYER_
 	updateCurrency,
 	updateSetting,
 });
+export type PlayerState = ReturnType<typeof dataReducer>;

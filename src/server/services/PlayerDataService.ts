@@ -27,14 +27,14 @@ export class PlayerDataService implements OnInit {
 		});
 
 		task.spawn(() => {
-			while (1 + 1 === 2) {
-				Players.GetPlayers().forEach((player) => {
-					print(true);
-					const profile = this.getProfile(player);
-					if (profile) profile.adjustTaps(1);
-				});
-				task.wait(1);
-			}
+			// while (1 + 1 === 2) {
+			// 	Players.GetPlayers().forEach((player) => {
+			// 		print(true);
+			// 		const profile = this.getProfile(player);
+			// 		if (profile) profile.adjustTaps(1);
+			// 	});
+			// 	task.wait(1);
+			// }
 		});
 	}
 

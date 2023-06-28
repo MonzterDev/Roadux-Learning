@@ -2,6 +2,8 @@ import Roact from "@rbxts/roact";
 import { StoreProvider } from "@rbxts/roact-rodux-hooked";
 import { clientStore } from "client/rodux/rodux";
 import SettingFrame from "../components/Settings/SettingFrame";
+import { Settings } from "shared/constants/Settings";
+import SettingFrame2 from "../components/Settings/SettingFrame2";
 
 interface Props {}
 
@@ -11,6 +13,10 @@ export class SettingsApp extends Roact.Component<Props> {
 	}
 
 	public render() {
+		const settingFrames = Settings.map((setting) => {
+			return <SettingFrame2 setting={setting} />;
+		});
+
 		return (
 			<StoreProvider store={clientStore}>
 				<screengui>
@@ -42,8 +48,7 @@ export class SettingsApp extends Roact.Component<Props> {
 						>
 							<uigridlayout CellSize={UDim2.fromScale(0.95, 0.25)} HorizontalAlignment={"Center"} />
 
-							<SettingFrame setting={"Play Music"} />
-							<SettingFrame setting={"Combat"} />
+							{settingFrames}
 						</scrollingframe>
 					</frame>
 				</screengui>
