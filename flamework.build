@@ -8,7 +8,12 @@
 		"Roblox-TS-Template:out/client/controllers/TestController@TestController": "client/controllers/TestController@TestController",
 		"Roblox-TS-Template:out/client/ui/apps/Settings@SettingsApp": "client/ui/apps/Settings@SettingsApp",
 		"Roblox-TS-Template:out/client/ui/components/Settings/SettingFrame@SettingsFrame": "client/ui/components/Settings/SettingFrame@SettingsFrame",
-		"Roblox-TS-Template:out/client/controllers/SettingsController@SettingsController": "client/controllers/SettingsController@SettingsController"
+		"Roblox-TS-Template:out/client/controllers/SettingsController@SettingsController": "client/controllers/SettingsController@SettingsController",
+		"Roblox-TS-Template:out/client/ui/apps/Settings copy@SettingsApp": "client/ui/apps/Settings copy@SettingsApp",
+		"Roblox-TS-Template:out/client/ui/apps/PetInventory@SettingsApp": "client/ui/apps/PetInventory@SettingsApp",
+		"Roblox-TS-Template:out/client/ui/apps/PetInventory@PetInventoryApp": "client/ui/apps/PetInventory@PetInventoryApp",
+		"Roblox-TS-Template:out/client/controllers/PetsController@PetsController": "client/controllers/PetsController@PetsController",
+		"Roblox-TS-Template:out/server/services/PetsService@PetsService": "server/services/PetsService@PetsService"
 	},
 	"metadata": {}
 }

@@ -29,23 +29,34 @@ export interface UpdateSettingAction extends Action<PlayerDataKeys.updateSetting
 	value: boolean;
 }
 
-// // Define the `updateSetting` function
-// export function updateSetting(state: DataState, action: UpdateSettingAction): DataState {
-// 	state.settings[action.setting] = action.value;
-// 	return state;
-// }
-
 export function updateSetting(state: DataState, action: UpdateSettingAction): DataState {
 	state.settings[action.setting] = action.value;
 	return state;
 }
 
+export interface UpdatePetAction extends Action<PlayerDataKeys.updatePet> {
+	uuid: string;
+	equipped?: boolean;
+	locked?: boolean;
+}
+
+export function updatePet(state: DataState, action: UpdatePetAction): DataState {
+	const pet = state.petInventory[action.uuid];
+	if (!pet) return state;
+
+	if (action.equipped !== undefined) pet.equipped = action.equipped;
+	if (action.locked !== undefined) pet.locked = action.locked;
+
+	return state;
+}
+
 export type DataState = PlayerData;
-export type DataActions = UpdateDataAction | UpdateCurrencyAction | UpdateSettingAction;
+export type DataActions = UpdateDataAction | UpdateCurrencyAction | UpdateSettingAction | UpdatePetAction;
 
 export const dataReducer = createReducer<DataState, DataActions>(DEFAULT_PLAYER_DATA, {
 	init,
 	updateCurrency,
 	updateSetting,
+	updatePet,
 });
 export type PlayerState = ReturnType<typeof dataReducer>;

@@ -11,6 +11,8 @@ do
 	_inverse.init = "init"
 	PlayerDataKeys.updateSetting = "updateSetting"
 	_inverse.updateSetting = "updateSetting"
+	PlayerDataKeys.updatePet = "updatePet"
+	_inverse.updatePet = "updatePet"
 end
 return {
 	PlayerDataKeys = PlayerDataKeys,

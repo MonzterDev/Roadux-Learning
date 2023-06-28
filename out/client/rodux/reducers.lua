@@ -11,23 +11,33 @@ local function updateCurrency(state, action)
 	state[action.currency] = action.amount
 	return state
 end
--- // Define the `updateSetting` function
--- export function updateSetting(state: DataState, action: UpdateSettingAction): DataState {
--- state.settings[action.setting] = action.value;
--- return state;
--- }
 local function updateSetting(state, action)
 	state.settings[action.setting] = action.value
+	return state
+end
+local function updatePet(state, action)
+	local pet = state.petInventory[action.uuid]
+	if not pet then
+		return state
+	end
+	if action.equipped ~= nil then
+		pet.equipped = action.equipped
+	end
+	if action.locked ~= nil then
+		pet.locked = action.locked
+	end
 	return state
 end
 local dataReducer = createReducer(DEFAULT_PLAYER_DATA, {
 	init = init,
 	updateCurrency = updateCurrency,
 	updateSetting = updateSetting,
+	updatePet = updatePet,
 })
 return {
 	init = init,
 	updateCurrency = updateCurrency,
 	updateSetting = updateSetting,
+	updatePet = updatePet,
 	dataReducer = dataReducer,
 }

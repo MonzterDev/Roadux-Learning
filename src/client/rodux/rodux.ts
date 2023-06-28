@@ -1,7 +1,5 @@
-import { combineReducers, Store } from "@rbxts/rodux";
-import { HttpService } from "@rbxts/services";
+import { Store } from "@rbxts/rodux";
 import { Events, Functions } from "client/network";
-import { PlayerData } from "shared/types/PlayerData";
 import { DataActions, dataReducer, DataState } from "./reducers";
 import { PlayerDataKeys } from "shared/types/Rodux";
 import { DEFAULT_PLAYER_DATA } from "shared/constants/PlayerData";
@@ -20,3 +18,8 @@ clientStore.dispatch({ type: PlayerDataKeys.init, data: DEFAULT_PLAYER_DATA });
 // 	const playerData = <PlayerData>HttpService.JSONDecode(data);
 // 	clientStore.dispatch({ type: PlayerDataKeys.init, data: playerData });
 // });
+
+Events.equipPet.connect((uuid) => clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, equipped: true }));
+Events.unequipPet.connect((uuid) =>
+	clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, equipped: false }),
+);

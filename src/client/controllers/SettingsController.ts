@@ -17,10 +17,10 @@ export class SettingsController implements OnStart {
 
 	onStart() {
 		withHookDetection(Roact);
-		mount(
-			createElement(RoactRodux.StoreProvider, { store: clientStore }, [createElement(SettingsApp)]),
-			this.playerGui,
-		);
+		// mount(
+		// 	createElement(RoactRodux.StoreProvider, { store: clientStore }, [createElement(SettingsApp)]),
+		// 	this.playerGui,
+		// );
 
 		clientStore.changed.connect((newState) => print(newState));
 	}
