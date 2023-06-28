@@ -11,6 +11,7 @@ local RoactRodux = TS.import(script, game:GetService("ReplicatedStorage"), "rbxt
 local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
 local clientStore = TS.import(script, script.Parent.Parent, "rodux", "rodux").clientStore
 local SettingsApp = TS.import(script, script.Parent.Parent, "ui", "apps", "Settings").SettingsApp
+local PlayerDataKeys = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "types", "Rodux").PlayerDataKeys
 local SettingsController
 do
 	SettingsController = setmetatable({}, {
@@ -35,6 +36,18 @@ do
 		clientStore.changed:connect(function(newState)
 			return print(newState)
 		end)
+	end
+	function SettingsController:updateSetting(setting, value)
+		local currentValue = clientStore:getState().settings[setting]
+		if currentValue == value then
+			return nil
+		end
+		local action = {
+			type = PlayerDataKeys.updateSetting,
+			setting = setting,
+			value = value,
+		}
+		clientStore:dispatch(action)
 	end
 end
 -- (Flamework) SettingsController metadata

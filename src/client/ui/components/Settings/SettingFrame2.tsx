@@ -1,10 +1,10 @@
+import { Dependency } from "@flamework/core";
 import Roact from "@rbxts/roact";
 import RoactRodux from "@rbxts/roact-rodux";
 import Rodux from "@rbxts/rodux";
+import { SettingsController } from "client/controllers/SettingsController";
 import { PlayerState, UpdateSettingAction } from "client/rodux/reducers";
-import { clientStore } from "client/rodux/rodux";
 import { Setting } from "shared/constants/Settings";
-import { PlayerDataKeys } from "shared/types/Rodux";
 
 // Uses roact-rodux
 
@@ -18,6 +18,7 @@ interface UIProps extends StateProps {}
 interface UIState {}
 
 function SettingsFrame2(props: StateProps) {
+	const settingsController = Dependency(SettingsController);
 	const isEnabled = props.isEnabled;
 
 	return (
@@ -47,14 +48,7 @@ function SettingsFrame2(props: StateProps) {
 				Size={UDim2.fromScale(0.075, 0.3)}
 				BackgroundColor3={isEnabled ? new Color3(0.13, 0.92, 0.17) : new Color3(0.92, 0.13, 0.13)}
 				Event={{
-					MouseButton1Click: () => {
-						const action: UpdateSettingAction = {
-							type: PlayerDataKeys.updateSetting,
-							setting: props.setting,
-							value: !isEnabled,
-						};
-						clientStore.dispatch(action);
-					},
+					MouseButton1Click: () => settingsController.updateSetting(props.setting, !isEnabled),
 				}}
 			>
 				<uicorner CornerRadius={new UDim(0.3, 0)} />

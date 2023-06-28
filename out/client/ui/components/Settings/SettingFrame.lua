@@ -1,11 +1,12 @@
 -- Compiled with roblox-ts v2.1.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Flamework = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Flamework
 local Roact = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact", "src")
 local useState = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src").useState
 local clientStore = TS.import(script, script.Parent.Parent.Parent.Parent, "rodux", "rodux").clientStore
-local PlayerDataKeys = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "types", "Rodux").PlayerDataKeys
 -- Uses roact-hooked
 local function SettingsFrame(props)
+	local settingsController = Flamework.resolveDependency("client/controllers/SettingsController@SettingsController")
 	local isEnabled, setIsEnabled = useState(function()
 		local currentState = clientStore:getState()
 		return currentState.settings[props.setting]
@@ -14,12 +15,7 @@ local function SettingsFrame(props)
 		setIsEnabled(function(action)
 			return not action
 		end)
-		local action = {
-			type = PlayerDataKeys.updateSetting,
-			setting = props.setting,
-			value = not isEnabled,
-		}
-		clientStore:dispatch(action)
+		settingsController:updateSetting(props.setting, not isEnabled)
 	end
 	return Roact.createElement("Frame", {
 		BackgroundColor3 = Color3.fromRGB(64, 64, 64),
