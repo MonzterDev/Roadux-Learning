@@ -24,11 +24,31 @@ do
 		self.playerDataService = Flamework.resolveDependency("server/services/PlayerDataService@PlayerDataService")
 	end
 	function PetsService:onStart()
-		Events.equipPet:connect(function(player, uuid)
-			return self:equipPet(player, uuid)
-		end)
-		Events.unequipPet:connect(function(player, uuid)
-			return self:unequipPet(player, uuid)
+		Events.petAction:connect(function(player, uuid, action)
+			print("pet action", player, uuid, action)
+			repeat
+				if action == "Equip" then
+					self:equipPet(player, uuid)
+					break
+				end
+				if action == "Unequip" then
+					self:unequipPet(player, uuid)
+					break
+				end
+				if action == "Lock" then
+					self:lockPet(player, uuid)
+					break
+				end
+				if action == "Unlock" then
+					self:unlockPet(player, uuid)
+					break
+				end
+				if action == "Delete" then
+					self:deletePet(player, uuid)
+					break
+				end
+				break
+			until true
 		end)
 		task.delay(5, function()
 			print("giving pet")
@@ -57,19 +77,16 @@ do
 		Events.givePet(player, pet)
 	end
 	function PetsService:equipPet(player, uuid)
-		print("Update")
 		local profile = self.playerDataService:getProfile(player)
 		if not profile then
 			return nil
 		end
-		print(uuid)
 		local pet = profile.data.petInventory[uuid]
 		if not pet then
 			return nil
 		end
-		print("Update")
 		pet.equipped = true
-		Events.equipPet(player, uuid)
+		Events.petAction(player, uuid, "Equip")
 	end
 	function PetsService:unequipPet(player, uuid)
 		local profile = self.playerDataService:getProfile(player)
@@ -81,7 +98,44 @@ do
 			return nil
 		end
 		pet.equipped = false
-		Events.unequipPet(player, uuid)
+		Events.petAction(player, uuid, "Unequip")
+	end
+	function PetsService:deletePet(player, uuid)
+		print("Delete")
+		local profile = self.playerDataService:getProfile(player)
+		if not profile then
+			return nil
+		end
+		local pet = profile.data.petInventory[uuid]
+		if not pet then
+			return nil
+		end
+		profile.data.petInventory[uuid] = nil
+		Events.petAction(player, uuid, "Delete")
+	end
+	function PetsService:lockPet(player, uuid)
+		local profile = self.playerDataService:getProfile(player)
+		if not profile then
+			return nil
+		end
+		local pet = profile.data.petInventory[uuid]
+		if not pet then
+			return nil
+		end
+		pet.locked = true
+		Events.petAction(player, uuid, "Lock")
+	end
+	function PetsService:unlockPet(player, uuid)
+		local profile = self.playerDataService:getProfile(player)
+		if not profile then
+			return nil
+		end
+		local pet = profile.data.petInventory[uuid]
+		if not pet then
+			return nil
+		end
+		pet.locked = false
+		Events.petAction(player, uuid, "Unlock")
 	end
 end
 -- (Flamework) PetsService metadata

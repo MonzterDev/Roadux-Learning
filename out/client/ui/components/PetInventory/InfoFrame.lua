@@ -1,11 +1,28 @@
 -- Compiled with roblox-ts v2.1.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local Roact = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact", "src")
+local useEffect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src").useEffect
 local RoactRodux = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-rodux", "src")
+local GenerateViewport = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "viewport-model", "src").GenerateViewport
 local Events = TS.import(script, script.Parent.Parent.Parent.Parent, "network").Events
+local GetPetModel = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets").GetPetModel
 local function PetInfoFrame(props)
 	local isEquipped = props.equipped
+	local isLocked = props.locked
 	local infoFrameRef = Roact.createRef()
+	local viewportRef = Roact.createRef()
+	local model = GetPetModel(props.pet)
+	-- Have to use this because we can't use the hook before it is set
+	useEffect(function()
+		local viewport = viewportRef:getValue()
+		local _result = viewport
+		if _result ~= nil then
+			_result = _result:FindFirstChildOfClass("Model")
+		end
+		if not _result then
+			GenerateViewport(viewportRef:getValue(), model:Clone())
+		end
+	end)
 	return Roact.createFragment({
 		Info = Roact.createElement("Frame", {
 			AnchorPoint = Vector2.new(0.5, 0),
@@ -49,13 +66,17 @@ local function PetInfoFrame(props)
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0.5, 0, 0.109, 0),
 				Size = UDim2.new(0.678, 0, 0.243, 0),
+				[Roact.Ref] = viewportRef,
 			}, {
 				Lock = Roact.createElement("ImageButton", {
 					BackgroundTransparency = 1,
-					Image = "rbxassetid://12359088245",
+					Image = if isLocked then "rbxassetid://12012052569" else "rbxassetid://12359088245",
 					Position = UDim2.new(0.05, 0, 0.55, 0),
 					ScaleType = Enum.ScaleType.Fit,
 					Size = UDim2.new(0.15, 0, 0.4, 0),
+					[Roact.Event.MouseButton1Click] = function()
+						Events.petAction(props.uuid, if isLocked then "Unlock" else "Lock")
+					end,
 				}),
 				Rename = Roact.createElement("ImageButton", {
 					BackgroundTransparency = 1,
@@ -214,9 +235,9 @@ local function PetInfoFrame(props)
 					TextWrapped = true,
 					[Roact.Event.MouseButton1Click] = function()
 						if isEquipped then
-							Events.unequipPet:fire(props.uuid)
+							Events.petAction(props.uuid, "Unequip")
 						else
-							Events.equipPet:fire(props.uuid)
+							Events.petAction(props.uuid, "Equip")
 						end
 					end,
 				}, {
@@ -247,6 +268,11 @@ local function PetInfoFrame(props)
 					TextScaled = true,
 					TextSize = 14,
 					TextWrapped = true,
+					[Roact.Event.MouseButton1Click] = function()
+						if not isLocked then
+							Events.petAction(props.uuid, "Delete")
+						end
+					end,
 				}, {
 					Roact.createElement("UICorner", {
 						CornerRadius = UDim.new(0.35000000000000003, 0),
@@ -258,6 +284,12 @@ local function PetInfoFrame(props)
 end
 local function mapState(state, props)
 	local pet = state.petInventory[props.uuid]
+	if not pet then
+		return {
+			equipped = false,
+			locked = false,
+		}
+	end
 	local _object = {}
 	local _left = "equipped"
 	local _condition = pet.equipped
@@ -265,6 +297,12 @@ local function mapState(state, props)
 		_condition = false
 	end
 	_object[_left] = _condition
+	local _left_1 = "locked"
+	local _condition_1 = pet.locked
+	if _condition_1 == nil then
+		_condition_1 = false
+	end
+	_object[_left_1] = _condition_1
 	return _object
 end
 local function mapDispatch(dispatch)

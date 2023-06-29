@@ -10,8 +10,28 @@ export class PetsService implements OnStart {
 	private playerDataService = Dependency(PlayerDataService);
 
 	onStart() {
-		Events.equipPet.connect((player, uuid) => this.equipPet(player, uuid));
-		Events.unequipPet.connect((player, uuid) => this.unequipPet(player, uuid));
+		Events.petAction.connect((player, uuid, action) => {
+			print("pet action", player, uuid, action);
+			switch (action) {
+				case "Equip":
+					this.equipPet(player, uuid);
+					break;
+				case "Unequip":
+					this.unequipPet(player, uuid);
+					break;
+				case "Lock":
+					this.lockPet(player, uuid);
+					break;
+				case "Unlock":
+					this.unlockPet(player, uuid);
+					break;
+				case "Delete":
+					this.deletePet(player, uuid);
+					break;
+				default:
+					break;
+			}
+		});
 
 		task.delay(5, () => {
 			print("giving pet");
@@ -36,17 +56,14 @@ export class PetsService implements OnStart {
 	}
 
 	private equipPet(player: Player, uuid: string) {
-		print("Update");
 		const profile = this.playerDataService.getProfile(player);
 		if (!profile) return;
 
-		print(uuid);
 		const pet = profile.data.petInventory[uuid];
 		if (!pet) return;
 
-		print("Update");
 		pet.equipped = true;
-		Events.equipPet(player, uuid);
+		Events.petAction(player, uuid, "Equip");
 	}
 
 	private unequipPet(player: Player, uuid: string) {
@@ -57,6 +74,40 @@ export class PetsService implements OnStart {
 		if (!pet) return;
 
 		pet.equipped = false;
-		Events.unequipPet(player, uuid);
+		Events.petAction(player, uuid, "Unequip");
+	}
+
+	private deletePet(player: Player, uuid: string) {
+		print("Delete");
+		const profile = this.playerDataService.getProfile(player);
+		if (!profile) return;
+
+		const pet = profile.data.petInventory[uuid];
+		if (!pet) return;
+
+		profile.data.petInventory[uuid] = undefined as never as PetInstance;
+		Events.petAction(player, uuid, "Delete");
+	}
+
+	private lockPet(player: Player, uuid: string) {
+		const profile = this.playerDataService.getProfile(player);
+		if (!profile) return;
+
+		const pet = profile.data.petInventory[uuid];
+		if (!pet) return;
+
+		pet.locked = true;
+		Events.petAction(player, uuid, "Lock");
+	}
+
+	private unlockPet(player: Player, uuid: string) {
+		const profile = this.playerDataService.getProfile(player);
+		if (!profile) return;
+
+		const pet = profile.data.petInventory[uuid];
+		if (!pet) return;
+
+		pet.locked = false;
+		Events.petAction(player, uuid, "Unlock");
 	}
 }

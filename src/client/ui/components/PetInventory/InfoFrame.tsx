@@ -1,19 +1,34 @@
 import Roact from "@rbxts/roact";
+import { useEffect } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
 import Rodux from "@rbxts/rodux";
+import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
 import { Events } from "client/network";
 import { PlayerState } from "client/rodux/reducers";
-import { Pet } from "shared/constants/Pets";
+import { GetPetModel, Pet } from "shared/constants/Pets";
 
 interface Props {
 	pet: Pet;
 	uuid: string;
 	equipped: boolean;
+	locked: boolean;
 }
 
 function PetInfoFrame(props: Props) {
 	const isEquipped = props.equipped;
+	const isLocked = props.locked;
 	const infoFrameRef = Roact.createRef<Frame>();
+	const viewportRef = Roact.createRef<ViewportFrame>();
+
+	const model = GetPetModel(props.pet);
+
+	// Have to use this because we can't use the hook before it is set
+	useEffect(() => {
+		const viewport = viewportRef.getValue();
+		if (!viewport?.FindFirstChildOfClass("Model")) {
+			GenerateViewport(viewportRef.getValue()!, model.Clone());
+		}
+	});
 
 	return (
 		<frame
@@ -58,14 +73,20 @@ function PetInfoFrame(props: Props) {
 				BackgroundTransparency={1}
 				Position={new UDim2(0.5, 0, 0.109, 0)}
 				Size={new UDim2(0.678, 0, 0.243, 0)}
+				Ref={viewportRef}
 			>
 				<imagebutton
 					Key="Lock"
 					BackgroundTransparency={1}
-					Image="rbxassetid://12359088245"
+					Image={isLocked ? "rbxassetid://12012052569" : "rbxassetid://12359088245"}
 					Position={new UDim2(0.05, 0, 0.55, 0)}
 					ScaleType={Enum.ScaleType.Fit}
 					Size={new UDim2(0.15, 0, 0.4, 0)}
+					Event={{
+						MouseButton1Click: () => {
+							Events.petAction(props.uuid, isLocked ? "Unlock" : "Lock");
+						},
+					}}
 				/>
 				<imagebutton
 					Key="Rename"
@@ -225,8 +246,8 @@ function PetInfoFrame(props: Props) {
 					TextWrapped={true}
 					Event={{
 						MouseButton1Click: () => {
-							if (isEquipped) Events.unequipPet.fire(props.uuid);
-							else Events.equipPet.fire(props.uuid);
+							if (isEquipped) Events.petAction(props.uuid, "Unequip");
+							else Events.petAction(props.uuid, "Equip");
 						},
 					}}
 				>
@@ -255,6 +276,11 @@ function PetInfoFrame(props: Props) {
 					TextScaled={true}
 					TextSize={14}
 					TextWrapped={true}
+					Event={{
+						MouseButton1Click: () => {
+							if (!isLocked) Events.petAction(props.uuid, "Delete");
+						},
+					}}
 				>
 					<uicorner CornerRadius={new UDim(0.35000000000000003, 0)} />
 				</textbutton>
@@ -265,8 +291,14 @@ function PetInfoFrame(props: Props) {
 
 function mapState(state: PlayerState, props: Props) {
 	const pet = state.petInventory[props.uuid];
+	if (!pet)
+		return {
+			equipped: false,
+			locked: false,
+		};
 	return {
 		equipped: pet.equipped ?? false,
+		locked: pet.locked ?? false,
 	};
 }
 

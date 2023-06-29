@@ -19,7 +19,34 @@ clientStore.dispatch({ type: PlayerDataKeys.init, data: DEFAULT_PLAYER_DATA });
 // 	clientStore.dispatch({ type: PlayerDataKeys.init, data: playerData });
 // });
 
-Events.equipPet.connect((uuid) => clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, equipped: true }));
-Events.unequipPet.connect((uuid) =>
-	clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, equipped: false }),
-);
+Events.petAction.connect((uuid, action) => {
+	switch (action) {
+		case "Equip":
+			clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, equipped: true });
+			break;
+		case "Unequip":
+			clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, equipped: false });
+			break;
+		case "Delete":
+			clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, delete: true });
+			break;
+		case "Lock":
+			clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, locked: true });
+			break;
+		case "Unlock":
+			clientStore.dispatch({ type: PlayerDataKeys.updatePet, uuid: uuid, locked: false });
+			break;
+		default:
+			break;
+	}
+});
+
+Events.givePet.connect((petInstance) => {
+	clientStore.dispatch({
+		type: PlayerDataKeys.givePet,
+		uuid: petInstance.uuid,
+		pet: petInstance.type,
+		rarity: petInstance.rarity,
+	});
+	print("Pet received");
+});

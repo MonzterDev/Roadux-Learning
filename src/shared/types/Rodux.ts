@@ -3,4 +3,5 @@ export enum PlayerDataKeys {
 	init = "init",
 	updateSetting = "updateSetting",
 	updatePet = "updatePet",
+	givePet = "givePet",
 }

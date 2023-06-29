@@ -13,6 +13,8 @@ do
 	_inverse.updateSetting = "updateSetting"
 	PlayerDataKeys.updatePet = "updatePet"
 	_inverse.updatePet = "updatePet"
+	PlayerDataKeys.givePet = "givePet"
+	_inverse.givePet = "givePet"
 end
 return {
 	PlayerDataKeys = PlayerDataKeys,

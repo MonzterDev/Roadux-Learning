@@ -26,6 +26,22 @@ local function updatePet(state, action)
 	if action.locked ~= nil then
 		pet.locked = action.locked
 	end
+	print(action)
+	if action.delete then
+		state.petInventory[action.uuid] = nil
+		print("Deleted", state.petInventory)
+	end
+	return state
+end
+local function givePet(state, action)
+	local petInstance = {
+		uuid = action.uuid,
+		type = action.pet,
+		rarity = action.rarity,
+		equipped = false,
+		locked = false,
+	}
+	state.petInventory[action.uuid] = petInstance
 	return state
 end
 local dataReducer = createReducer(DEFAULT_PLAYER_DATA, {
@@ -33,11 +49,13 @@ local dataReducer = createReducer(DEFAULT_PLAYER_DATA, {
 	updateCurrency = updateCurrency,
 	updateSetting = updateSetting,
 	updatePet = updatePet,
+	givePet = givePet,
 })
 return {
 	init = init,
 	updateCurrency = updateCurrency,
 	updateSetting = updateSetting,
 	updatePet = updatePet,
+	givePet = givePet,
 	dataReducer = dataReducer,
 }

@@ -18,19 +18,59 @@ clientStore:dispatch({
 -- const playerData = <PlayerData>HttpService.JSONDecode(data);
 -- clientStore.dispatch({ type: PlayerDataKeys.init, data: playerData });
 -- });
-Events.equipPet:connect(function(uuid)
-	return clientStore:dispatch({
-		type = PlayerDataKeys.updatePet,
-		uuid = uuid,
-		equipped = true,
-	})
+Events.petAction:connect(function(uuid, action)
+	repeat
+		if action == "Equip" then
+			clientStore:dispatch({
+				type = PlayerDataKeys.updatePet,
+				uuid = uuid,
+				equipped = true,
+			})
+			break
+		end
+		if action == "Unequip" then
+			clientStore:dispatch({
+				type = PlayerDataKeys.updatePet,
+				uuid = uuid,
+				equipped = false,
+			})
+			break
+		end
+		if action == "Delete" then
+			clientStore:dispatch({
+				type = PlayerDataKeys.updatePet,
+				uuid = uuid,
+				delete = true,
+			})
+			break
+		end
+		if action == "Lock" then
+			clientStore:dispatch({
+				type = PlayerDataKeys.updatePet,
+				uuid = uuid,
+				locked = true,
+			})
+			break
+		end
+		if action == "Unlock" then
+			clientStore:dispatch({
+				type = PlayerDataKeys.updatePet,
+				uuid = uuid,
+				locked = false,
+			})
+			break
+		end
+		break
+	until true
 end)
-Events.unequipPet:connect(function(uuid)
-	return clientStore:dispatch({
-		type = PlayerDataKeys.updatePet,
-		uuid = uuid,
-		equipped = false,
+Events.givePet:connect(function(petInstance)
+	clientStore:dispatch({
+		type = PlayerDataKeys.givePet,
+		uuid = petInstance.uuid,
+		pet = petInstance.type,
+		rarity = petInstance.rarity,
 	})
+	print("Pet received")
 end)
 return {
 	clientStore = clientStore,

@@ -6,11 +6,12 @@ local _roact = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_in
 local Roact = _roact
 local createElement = _roact.createElement
 local mount = _roact.mount
+local unmount = _roact.unmount
 local withHookDetection = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src").withHookDetection
 local RoactRodux = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-rodux", "src")
 local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
 local clientStore = TS.import(script, script.Parent.Parent, "rodux", "rodux").clientStore
-local PetInventoryApp = TS.import(script, script.Parent.Parent, "ui", "apps", "PetInventory").PetInventoryApp
+local PetInventory = TS.import(script, script.Parent.Parent, "ui", "apps", "PetInventory").default
 local PetsController
 do
 	PetsController = setmetatable({}, {
@@ -29,9 +30,14 @@ do
 	end
 	function PetsController:onStart()
 		withHookDetection(Roact)
-		mount(createElement(RoactRodux.StoreProvider, {
+		local handle
+		handle = mount(createElement(RoactRodux.StoreProvider, {
 			store = clientStore,
-		}, { createElement(PetInventoryApp) }), self.playerGui)
+		}, { createElement(PetInventory, {
+			onClick = function()
+				unmount(handle)
+			end,
+		}) }), self.playerGui)
 	end
 	function PetsController:performPetAction(action)
 		repeat

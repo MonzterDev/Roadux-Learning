@@ -1,10 +1,12 @@
 import { Networking } from "@flamework/networking";
 import { PlayerData } from "./types/PlayerData";
-import { PetInstance } from "./constants/Pets";
+import { PetAction, PetInstance } from "./constants/Pets";
 
 interface ServerEvents {
 	equipPet: (uuid: string) => void;
 	unequipPet: (uuid: string) => void;
+
+	petAction: (uuid: string, action: PetAction) => void;
 }
 
 interface ServerFunctions {
@@ -18,8 +20,7 @@ interface ClientEvents {
 	replicatePlayerState: (action: string) => void;
 
 	givePet: (pet: PetInstance) => void;
-	equipPet: (uuid: string) => void;
-	unequipPet: (uuid: string) => void;
+	petAction: (uuid: string, action: PetAction) => void;
 }
 
 interface ClientFunctions {}
