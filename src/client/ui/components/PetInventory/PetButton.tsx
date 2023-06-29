@@ -13,6 +13,8 @@ interface Props {
 	rarity: Rarity;
 	equipped: boolean;
 
+	visible: boolean;
+
 	onClick: () => void;
 }
 
@@ -40,6 +42,7 @@ function PetButton(props: Props) {
 			Text={""}
 			TextColor3={Color3.fromRGB(0, 0, 0)}
 			TextSize={14}
+			Visible={props.visible}
 			Event={{ MouseButton1Click: props.onClick }}
 		>
 			<uicorner CornerRadius={new UDim(0.1, 0)} />

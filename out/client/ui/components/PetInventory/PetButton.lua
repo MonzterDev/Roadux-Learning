@@ -31,6 +31,7 @@ local function PetButton(props)
 			Text = "",
 			TextColor3 = Color3.fromRGB(0, 0, 0),
 			TextSize = 14,
+			Visible = props.visible,
 			[Roact.Event.MouseButton1Click] = props.onClick,
 		}, {
 			Roact.createElement("UICorner", {

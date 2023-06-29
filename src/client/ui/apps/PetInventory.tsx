@@ -5,6 +5,7 @@ import {
 	PET_ACTION_BUTTONS,
 	PetActionButton,
 	PetInstance,
+	PetInventory,
 	getBestPets,
 	getEquippedPets,
 	getMaxPetsEquipped,
@@ -30,6 +31,9 @@ interface Props {
 function PetInventory(props: Props) {
 	const [isDeleteMode, setDeleteMode] = useState(false);
 	const [selectedPet, setSelectedPet] = useState<PetInstance>(undefined);
+	const [searchString, setSearchString] = useState<string>("");
+
+	const searchBoxRef = Roact.createRef<TextBox>();
 
 	const actionButtons = PET_ACTION_BUTTONS.map((action) => {
 		return <ActionButton action={action} onClick={() => performAction(action)} />;
@@ -41,10 +45,14 @@ function PetInventory(props: Props) {
 				uuid={pet.uuid}
 				name={pet.name}
 				rarity={pet.rarity}
+				visible={
+					pet.name.lower().find(searchString.lower())[0] !== undefined ||
+					pet.type.lower().find(searchString.lower())[0] !== undefined ||
+					searchString.lower() === ""
+				}
 				onClick={() => {
 					if (isDeleteMode) print(true);
 					else setSelectedPet(pet);
-					print("Selected Pet ", selectedPet);
 				}}
 			/>
 		);
@@ -185,6 +193,10 @@ function PetInventory(props: Props) {
 							TextSize={14}
 							TextWrapped={true}
 							TextXAlignment={Enum.TextXAlignment.Left}
+							Ref={searchBoxRef}
+							Change={{
+								Text: (rbx) => setSearchString(rbx.Text),
+							}}
 						/>
 					</frame>
 					<frame

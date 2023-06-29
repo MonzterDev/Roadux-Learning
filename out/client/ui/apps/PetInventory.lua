@@ -22,6 +22,8 @@ local performAction
 local function PetInventory(props)
 	local isDeleteMode, setDeleteMode = useState(false)
 	local selectedPet, setSelectedPet = useState(nil)
+	local searchString, setSearchString = useState("")
+	local searchBoxRef = Roact.createRef()
 	local _arg0 = function(action)
 		return Roact.createElement(ActionButton, {
 			action = action,
@@ -39,20 +41,32 @@ local function PetInventory(props)
 	local actionButtons = _newValue
 	local _pets = props.pets
 	local _arg0_1 = function(pet)
-		return Roact.createElement(PetButton, {
+		local _attributes = {
 			pet = pet.type,
 			uuid = pet.uuid,
 			name = pet.name,
 			rarity = pet.rarity,
-			onClick = function()
-				if isDeleteMode then
-					print(true)
-				else
-					setSelectedPet(pet)
-				end
-				print("Selected Pet ", selectedPet)
-			end,
-		})
+		}
+		local _exp = string.lower(pet.name)
+		local _arg0_2 = string.lower(searchString)
+		local _condition = (string.find(_exp, _arg0_2)) ~= nil
+		if not _condition then
+			local _exp_1 = string.lower(pet.type)
+			local _arg0_3 = string.lower(searchString)
+			_condition = (string.find(_exp_1, _arg0_3)) ~= nil
+			if not _condition then
+				_condition = string.lower(searchString) == ""
+			end
+		end
+		_attributes.visible = _condition
+		_attributes.onClick = function()
+			if isDeleteMode then
+				print(true)
+			else
+				setSelectedPet(pet)
+			end
+		end
+		return Roact.createElement(PetButton, _attributes)
 	end
 	-- ▼ ReadonlyArray.map ▼
 	local _newValue_1 = table.create(#_pets)
@@ -220,6 +234,10 @@ local function PetInventory(props)
 			TextSize = 14,
 			TextWrapped = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
+			[Roact.Ref] = searchBoxRef,
+			[Roact.Change.Text] = function(rbx)
+				return setSearchString(rbx.Text)
+			end,
 		}),
 	})
 	_children_2.Storage = Roact.createElement("Frame", {
