@@ -50,3 +50,10 @@ Events.givePet.connect((petInstance) => {
 	});
 	print("Pet received");
 });
+Events.renamePet.connect((uuid, name) => {
+	clientStore.dispatch({
+		type: PlayerDataKeys.renamePet,
+		uuid: uuid,
+		name: name,
+	});
+});

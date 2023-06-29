@@ -72,6 +72,13 @@ Events.givePet:connect(function(petInstance)
 	})
 	print("Pet received")
 end)
+Events.renamePet:connect(function(uuid, name)
+	clientStore:dispatch({
+		type = PlayerDataKeys.renamePet,
+		uuid = uuid,
+		name = name,
+	})
+end)
 return {
 	clientStore = clientStore,
 }

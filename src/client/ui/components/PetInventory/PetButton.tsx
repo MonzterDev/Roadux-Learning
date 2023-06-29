@@ -8,20 +8,26 @@ import { GetPetModel, Pet } from "shared/constants/Pets";
 
 interface Props {
 	pet: Pet;
+	name: string;
 	uuid: string;
-	onClick: () => void;
-
 	equipped: boolean;
+
+	onClick: () => void;
 }
 
 function PetButton(props: Props) {
 	const isEquipped = props.equipped;
-	const model = GetPetModel(props.pet);
 
 	const viewportRef = Roact.createRef<ViewportFrame>();
 
+	const model = GetPetModel(props.pet);
+
+	// Have to use this because we can't use the hook before it is set
 	useEffect(() => {
-		if (viewportRef.getValue()) GenerateViewport(viewportRef.getValue()!, model.Clone());
+		const viewport = viewportRef.getValue();
+		if (!viewport?.FindFirstChildOfClass("Model")) {
+			GenerateViewport(viewportRef.getValue()!, model.Clone());
+		}
 	});
 
 	return (
@@ -43,7 +49,7 @@ function PetButton(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.021, 0)}
 				Size={new UDim2(0.9, 0, 0.2, 0)}
-				Text={props.pet}
+				Text={props.name}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextScaled={true}
 				TextSize={14}

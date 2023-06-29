@@ -35,6 +35,27 @@ export function updateSetting(state: DataState, action: UpdateSettingAction): Da
 	return state;
 }
 
+export interface GivePetAction extends Action<PlayerDataKeys.givePet> {
+	pet: Pet;
+	rarity: Rarity;
+	uuid: string;
+}
+
+export function givePet(state: DataState, action: GivePetAction): DataState {
+	const petInstance: PetInstance = {
+		uuid: action.uuid,
+		type: action.pet,
+		name: action.pet,
+		rarity: action.rarity,
+		equipped: false,
+		locked: false,
+	};
+
+	state.petInventory[action.uuid] = petInstance;
+
+	return state;
+}
+
 export interface UpdatePetAction extends Action<PlayerDataKeys.updatePet> {
 	uuid: string;
 	equipped?: boolean;
@@ -49,31 +70,23 @@ export function updatePet(state: DataState, action: UpdatePetAction): DataState 
 	if (action.equipped !== undefined) pet.equipped = action.equipped;
 	if (action.locked !== undefined) pet.locked = action.locked;
 
-	print(action);
 	if (action.delete) {
 		state.petInventory[action.uuid] = undefined as never as PetInstance;
-		print("Deleted", state.petInventory);
 	}
 
 	return state;
 }
 
-export interface GivePetAction extends Action<PlayerDataKeys.givePet> {
-	pet: Pet;
-	rarity: Rarity;
+export interface RenamePetAction extends Action<PlayerDataKeys.renamePet> {
 	uuid: string;
+	name: string;
 }
 
-export function givePet(state: DataState, action: GivePetAction): DataState {
-	const petInstance: PetInstance = {
-		uuid: action.uuid,
-		type: action.pet,
-		rarity: action.rarity,
-		equipped: false,
-		locked: false,
-	};
+export function renamePet(state: DataState, action: RenamePetAction): DataState {
+	const pet = state.petInventory[action.uuid];
+	if (!pet) return state;
 
-	state.petInventory[action.uuid] = petInstance;
+	state.petInventory[action.uuid].name = action.name;
 
 	return state;
 }
@@ -84,7 +97,8 @@ export type DataActions =
 	| UpdateCurrencyAction
 	| UpdateSettingAction
 	| UpdatePetAction
-	| GivePetAction;
+	| GivePetAction
+	| RenamePetAction;
 
 export const dataReducer = createReducer<DataState, DataActions>(DEFAULT_PLAYER_DATA, {
 	init,
@@ -92,5 +106,6 @@ export const dataReducer = createReducer<DataState, DataActions>(DEFAULT_PLAYER_
 	updateSetting,
 	updatePet,
 	givePet,
+	renamePet,
 });
 export type PlayerState = ReturnType<typeof dataReducer>;

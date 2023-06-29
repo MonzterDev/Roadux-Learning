@@ -7,6 +7,7 @@ local GlobalEvents = createNetworkingEvent("shared/network@GlobalEvents", {
 	equipPet = { { t.string }, nil },
 	unequipPet = { { t.string }, nil },
 	petAction = { { t.string, t.union(t.literal("Equip"), t.literal("Unequip"), t.literal("Delete"), t.literal("Lock"), t.literal("Unlock")) }, nil },
+	renamePet = { { t.string, t.string }, nil },
 }, {
 	updateData = { { t.string }, nil },
 	updateTaps = { { t.number }, nil },
@@ -14,16 +15,19 @@ local GlobalEvents = createNetworkingEvent("shared/network@GlobalEvents", {
 	givePet = { { t.interface({
 		uuid = t.string,
 		type = t.union(t.literal("Dog"), t.literal("Cat"), t.literal("Turtle")),
+		name = t.string,
 		rarity = t.union(t.literal("Common"), t.literal("Uncommon"), t.literal("Rare")),
 		locked = t.optional(t.union(t.literal(false), t.literal(true))),
 		equipped = t.optional(t.union(t.literal(false), t.literal(true))),
 	}) }, nil },
 	petAction = { { t.string, t.union(t.literal("Equip"), t.literal("Unequip"), t.literal("Delete"), t.literal("Lock"), t.literal("Unlock")) }, nil },
+	renamePet = { { t.string, t.string }, nil },
 }, nil, nil, nil)
 local GlobalFunctions = createNetworkingFunction("shared/network@GlobalFunctions", {
 	getData = { { { t.union(t.literal("taps"), t.literal("gems"), t.literal("settings"), t.literal("petInventory")) }, nil }, t.union(t.literal(false), t.union(t.number, t.map(t.string, t.interface({
 		uuid = t.string,
 		type = t.union(t.literal("Dog"), t.literal("Cat"), t.literal("Turtle")),
+		name = t.string,
 		rarity = t.union(t.literal("Common"), t.literal("Uncommon"), t.literal("Rare")),
 		locked = t.optional(t.union(t.literal(false), t.literal(true))),
 		equipped = t.optional(t.union(t.literal(false), t.literal(true))),

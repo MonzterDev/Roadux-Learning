@@ -1,6 +1,6 @@
 import { Service, OnStart, Dependency } from "@flamework/core";
 import { Event } from "@rbxts/roact";
-import { HttpService, Players } from "@rbxts/services";
+import { HttpService, Players, TextService } from "@rbxts/services";
 import { Events } from "server/network";
 import { PetInstance } from "shared/constants/Pets";
 import { PlayerDataService } from "./PlayerDataService";
@@ -32,6 +32,7 @@ export class PetsService implements OnStart {
 					break;
 			}
 		});
+		Events.renamePet.connect((player, uuid, name) => this.renamePet(player, uuid, name));
 
 		task.delay(5, () => {
 			print("giving pet");
@@ -43,6 +44,7 @@ export class PetsService implements OnStart {
 		const pet: PetInstance = {
 			uuid: HttpService.GenerateGUID(false),
 			type: "Dog",
+			name: "Dog",
 			rarity: "Common",
 			equipped: false,
 			locked: false,
@@ -109,5 +111,23 @@ export class PetsService implements OnStart {
 
 		pet.locked = false;
 		Events.petAction(player, uuid, "Unlock");
+	}
+
+	private renamePet(player: Player, uuid: string, name: string) {
+		if (name.size() > 1 && name.size() < 25) return;
+
+		const profile = this.playerDataService.getProfile(player);
+		if (!profile) return;
+
+		const pet = profile.data.petInventory[uuid];
+		if (!pet) return;
+
+		const filteredName = TextService.FilterStringAsync(
+			name,
+			player.UserId,
+			Enum.TextFilterContext.PublicChat,
+		).GetNonChatStringForBroadcastAsync();
+		pet.name = filteredName;
+		Events.renamePet(player, uuid, name);
 	}
 }

@@ -1,26 +1,30 @@
 -- Compiled with roblox-ts v2.1.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local Roact = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact", "src")
-local useEffect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src").useEffect
+local _roact_hooked = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src")
+local useEffect = _roact_hooked.useEffect
+local useState = _roact_hooked.useState
 local RoactRodux = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-rodux", "src")
-local GenerateViewport = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "viewport-model", "src").GenerateViewport
+local _viewport_model = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "viewport-model", "src")
+local CleanViewport = _viewport_model.CleanViewport
+local GenerateViewport = _viewport_model.GenerateViewport
 local Events = TS.import(script, script.Parent.Parent.Parent.Parent, "network").Events
 local GetPetModel = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets").GetPetModel
 local function PetInfoFrame(props)
 	local isEquipped = props.equipped
 	local isLocked = props.locked
+	local isRenaming, setIsRenaming = useState(false)
 	local infoFrameRef = Roact.createRef()
 	local viewportRef = Roact.createRef()
+	local renameButtonRef = Roact.createRef()
+	local renameTextBoxRef = Roact.createRef()
 	local model = GetPetModel(props.pet)
 	-- Have to use this because we can't use the hook before it is set
 	useEffect(function()
 		local viewport = viewportRef:getValue()
-		local _result = viewport
-		if _result ~= nil then
-			_result = _result:FindFirstChildOfClass("Model")
-		end
-		if not _result then
-			GenerateViewport(viewportRef:getValue(), model:Clone())
+		if viewport then
+			CleanViewport(viewport)
+			GenerateViewport(viewport, model:Clone())
 		end
 	end)
 	return Roact.createFragment({
@@ -38,11 +42,12 @@ local function PetInfoFrame(props)
 				Font = Enum.Font.GothamBold,
 				Position = UDim2.new(0.5, 0, 0.021, 0),
 				Size = UDim2.new(0.9, 0, 0.067, 0),
-				Text = props.pet,
+				Text = props.name,
 				TextColor3 = Color3.fromRGB(255, 255, 255),
 				TextScaled = true,
 				TextSize = 14,
 				TextWrapped = true,
+				Visible = not isRenaming,
 			}),
 			Roact.createElement("UICorner", {
 				CornerRadius = UDim.new(0.025, 0),
@@ -59,7 +64,19 @@ local function PetInfoFrame(props)
 				TextScaled = true,
 				TextSize = 14,
 				TextWrapped = true,
-				Visible = false,
+				Visible = isRenaming,
+				[Roact.Ref] = renameTextBoxRef,
+				[Roact.Event.FocusLost] = function(enterPressed)
+					local textBox = renameTextBoxRef:getValue()
+					if not textBox then
+						return nil
+					end
+					if enterPressed and (#textBox.Text > 1 and #textBox.Text < 25) then
+						Events.renamePet(props.uuid, textBox.Text)
+					end
+					setIsRenaming(false)
+					textBox.Text = ""
+				end,
 			}),
 			Roact.createElement("ViewportFrame", {
 				AnchorPoint = Vector2.new(0.5, 0),
@@ -80,10 +97,13 @@ local function PetInfoFrame(props)
 				}),
 				Rename = Roact.createElement("ImageButton", {
 					BackgroundTransparency = 1,
-					Image = "rbxassetid://12359393622",
+					Image = if isRenaming then "rbxassetid://11506037946" else "rbxassetid://12359393622",
 					Position = UDim2.new(0.8200000000000001, 0, 0.55, 0),
 					ScaleType = Enum.ScaleType.Fit,
 					Size = UDim2.new(0.15, 0, 0.4, 0),
+					[Roact.Event.MouseButton1Click] = function()
+						return setIsRenaming(not isRenaming)
+					end,
 				}),
 			}),
 			Level = Roact.createElement("TextLabel", {

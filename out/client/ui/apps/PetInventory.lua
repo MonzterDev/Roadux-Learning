@@ -36,6 +36,7 @@ local function PetInventory(props)
 		return Roact.createElement(PetButton, {
 			pet = pet.type,
 			uuid = pet.uuid,
+			name = pet.name,
 			onClick = function()
 				if isDeleteMode then
 					print(true)
@@ -153,10 +154,11 @@ local function PetInventory(props)
 		SortOrder = Enum.SortOrder.LayoutOrder,
 	})
 	_children_3.Container = Roact.createElement("ScrollingFrame", _attributes_5, _children_5)
-	local _child = selectedPet and Roact.createElement(PetInfoFrame, {
+	local _child = selectedPet and (Roact.createElement(PetInfoFrame, {
 		pet = selectedPet.type,
 		uuid = selectedPet.uuid,
-	})
+		name = selectedPet.name,
+	}))
 	if _child then
 		_children_3[_length_3 + 1] = _child
 	end

@@ -7,10 +7,16 @@ local GenerateViewport = TS.import(script, game:GetService("ReplicatedStorage"),
 local GetPetModel = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets").GetPetModel
 local function PetButton(props)
 	local isEquipped = props.equipped
-	local model = GetPetModel(props.pet)
 	local viewportRef = Roact.createRef()
+	local model = GetPetModel(props.pet)
+	-- Have to use this because we can't use the hook before it is set
 	useEffect(function()
-		if viewportRef:getValue() then
+		local viewport = viewportRef:getValue()
+		local _result = viewport
+		if _result ~= nil then
+			_result = _result:FindFirstChildOfClass("Model")
+		end
+		if not _result then
 			GenerateViewport(viewportRef:getValue(), model:Clone())
 		end
 	end)
@@ -33,7 +39,7 @@ local function PetButton(props)
 				Font = Enum.Font.GothamBold,
 				Position = UDim2.new(0.5, 0, 0.021, 0),
 				Size = UDim2.new(0.9, 0, 0.2, 0),
-				Text = props.pet,
+				Text = props.name,
 				TextColor3 = Color3.fromRGB(255, 255, 255),
 				TextScaled = true,
 				TextSize = 14,

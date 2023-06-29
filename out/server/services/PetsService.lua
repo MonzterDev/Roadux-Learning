@@ -7,6 +7,7 @@ local Service = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_i
 local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
 local HttpService = _services.HttpService
 local Players = _services.Players
+local TextService = _services.TextService
 local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
 local PetsService
 do
@@ -50,6 +51,9 @@ do
 				break
 			until true
 		end)
+		Events.renamePet:connect(function(player, uuid, name)
+			return self:renamePet(player, uuid, name)
+		end)
 		task.delay(5, function()
 			print("giving pet")
 			local _exp = Players:GetPlayers()
@@ -65,6 +69,7 @@ do
 		local pet = {
 			uuid = HttpService:GenerateGUID(false),
 			type = "Dog",
+			name = "Dog",
 			rarity = "Common",
 			equipped = false,
 			locked = false,
@@ -136,6 +141,22 @@ do
 		end
 		pet.locked = false
 		Events.petAction(player, uuid, "Unlock")
+	end
+	function PetsService:renamePet(player, uuid, name)
+		if #name > 1 and #name < 25 then
+			return nil
+		end
+		local profile = self.playerDataService:getProfile(player)
+		if not profile then
+			return nil
+		end
+		local pet = profile.data.petInventory[uuid]
+		if not pet then
+			return nil
+		end
+		local filteredName = TextService:FilterStringAsync(name, player.UserId, Enum.TextFilterContext.PublicChat):GetNonChatStringForBroadcastAsync()
+		pet.name = filteredName
+		Events.renamePet(player, uuid, name)
 	end
 end
 -- (Flamework) PetsService metadata

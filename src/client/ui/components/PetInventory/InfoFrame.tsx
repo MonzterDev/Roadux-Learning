@@ -1,5 +1,5 @@
 import Roact from "@rbxts/roact";
-import { useEffect } from "@rbxts/roact-hooked";
+import { useEffect, useState } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
 import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
@@ -9,6 +9,7 @@ import { GetPetModel, Pet } from "shared/constants/Pets";
 
 interface Props {
 	pet: Pet;
+	name: string;
 	uuid: string;
 	equipped: boolean;
 	locked: boolean;
@@ -17,16 +18,21 @@ interface Props {
 function PetInfoFrame(props: Props) {
 	const isEquipped = props.equipped;
 	const isLocked = props.locked;
+	const [isRenaming, setIsRenaming] = useState(false);
+
 	const infoFrameRef = Roact.createRef<Frame>();
 	const viewportRef = Roact.createRef<ViewportFrame>();
+	const renameButtonRef = Roact.createRef<ImageButton>();
+	const renameTextBoxRef = Roact.createRef<TextBox>();
 
 	const model = GetPetModel(props.pet);
 
 	// Have to use this because we can't use the hook before it is set
 	useEffect(() => {
 		const viewport = viewportRef.getValue();
-		if (!viewport?.FindFirstChildOfClass("Model")) {
-			GenerateViewport(viewportRef.getValue()!, model.Clone());
+		if (viewport) {
+			CleanViewport(viewport);
+			GenerateViewport(viewport, model.Clone());
 		}
 	});
 
@@ -47,11 +53,12 @@ function PetInfoFrame(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.021, 0)}
 				Size={new UDim2(0.9, 0, 0.067, 0)}
-				Text={props.pet}
+				Text={props.name}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextScaled={true}
 				TextSize={14}
 				TextWrapped={true}
+				Visible={!isRenaming}
 			/>
 			<uicorner CornerRadius={new UDim(0.025, 0)} />
 			<textbox
@@ -66,7 +73,20 @@ function PetInfoFrame(props: Props) {
 				TextScaled={true}
 				TextSize={14}
 				TextWrapped={true}
-				Visible={false}
+				Visible={isRenaming}
+				Ref={renameTextBoxRef}
+				Event={{
+					FocusLost: (enterPressed) => {
+						const textBox = renameTextBoxRef.getValue();
+						if (!textBox) return;
+
+						if (enterPressed && textBox.Text.size() > 1 && textBox.Text.size() < 25)
+							Events.renamePet(props.uuid, textBox.Text);
+						setIsRenaming(false);
+
+						textBox.Text = "";
+					},
+				}}
 			/>
 			<viewportframe
 				AnchorPoint={new Vector2(0.5, 0)}
@@ -91,10 +111,13 @@ function PetInfoFrame(props: Props) {
 				<imagebutton
 					Key="Rename"
 					BackgroundTransparency={1}
-					Image="rbxassetid://12359393622"
+					Image={isRenaming ? "rbxassetid://11506037946" : "rbxassetid://12359393622"}
 					Position={new UDim2(0.8200000000000001, 0, 0.55, 0)}
 					ScaleType={Enum.ScaleType.Fit}
 					Size={new UDim2(0.15, 0, 0.4, 0)}
+					Event={{
+						MouseButton1Click: () => setIsRenaming(!isRenaming),
+					}}
 				/>
 			</viewportframe>
 			<textlabel

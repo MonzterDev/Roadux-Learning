@@ -16,6 +16,7 @@ export const DEFAULT_MAX_PET_EQUIPPED_AMOUNT = 5;
 export interface PetInstance {
 	uuid: string;
 	type: Pet;
+	name: string;
 	rarity: Rarity;
 	locked?: boolean;
 	equipped?: boolean;

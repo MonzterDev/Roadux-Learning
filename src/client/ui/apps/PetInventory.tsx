@@ -36,6 +36,7 @@ function PetInventory(props: Props) {
 			<PetButton
 				pet={pet.type}
 				uuid={pet.uuid}
+				name={pet.name}
 				onClick={() => {
 					if (isDeleteMode) print(true);
 					else setSelectedPet(pet);
@@ -120,7 +121,9 @@ function PetInventory(props: Props) {
 								SortOrder={Enum.SortOrder.LayoutOrder}
 							/>
 						</scrollingframe>
-						{selectedPet && <PetInfoFrame pet={selectedPet.type} uuid={selectedPet.uuid} />}
+						{selectedPet && (
+							<PetInfoFrame pet={selectedPet.type} uuid={selectedPet.uuid} name={selectedPet.name} />
+						)}
 					</frame>
 					<textbutton
 						Key="Exit"

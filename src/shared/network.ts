@@ -7,6 +7,7 @@ interface ServerEvents {
 	unequipPet: (uuid: string) => void;
 
 	petAction: (uuid: string, action: PetAction) => void;
+	renamePet: (uuid: string, name: string) => void;
 }
 
 interface ServerFunctions {
@@ -21,6 +22,7 @@ interface ClientEvents {
 
 	givePet: (pet: PetInstance) => void;
 	petAction: (uuid: string, action: PetAction) => void;
+	renamePet: (uuid: string, name: string) => void;
 }
 
 interface ClientFunctions {}

@@ -10,12 +10,14 @@ local DEFAULT_PLAYER_DATA = {
 		["1"] = {
 			uuid = "1",
 			type = "Dog",
+			name = "Test",
 			rarity = "Common",
 			equipped = true,
 			locked = false,
 		},
 		["2"] = {
 			uuid = "2",
+			name = "Cat",
 			type = "Cat",
 			rarity = "Rare",
 			equipped = false,

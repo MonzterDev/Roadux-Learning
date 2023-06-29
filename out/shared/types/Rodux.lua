@@ -15,6 +15,8 @@ do
 	_inverse.updatePet = "updatePet"
 	PlayerDataKeys.givePet = "givePet"
 	_inverse.givePet = "givePet"
+	PlayerDataKeys.renamePet = "renamePet"
+	_inverse.renamePet = "renamePet"
 end
 return {
 	PlayerDataKeys = PlayerDataKeys,
