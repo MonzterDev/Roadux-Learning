@@ -13,7 +13,8 @@
 		"Roblox-TS-Template:out/client/ui/apps/PetInventory@SettingsApp": "client/ui/apps/PetInventory@SettingsApp",
 		"Roblox-TS-Template:out/client/ui/apps/PetInventory@PetInventoryApp": "client/ui/apps/PetInventory@PetInventoryApp",
 		"Roblox-TS-Template:out/client/controllers/PetsController@PetsController": "client/controllers/PetsController@PetsController",
-		"Roblox-TS-Template:out/server/services/PetsService@PetsService": "server/services/PetsService@PetsService"
+		"Roblox-TS-Template:out/server/services/PetsService@PetsService": "server/services/PetsService@PetsService",
+		"Roblox-TS-Template:out/shared/constants/Pets@PetInstance": "shared/constants/Pets@PetInstance"
 	},
 	"metadata": {}
 }

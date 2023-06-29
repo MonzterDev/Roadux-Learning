@@ -11,6 +11,7 @@ local function ActionButton(props)
 			Text = "",
 			TextColor3 = Color3.fromRGB(0, 0, 0),
 			TextSize = 14,
+			[Roact.Event.MouseButton1Click] = props.onClick,
 		}, {
 			Roact.createElement("UICorner", {
 				CornerRadius = UDim.new(0.2, 0),

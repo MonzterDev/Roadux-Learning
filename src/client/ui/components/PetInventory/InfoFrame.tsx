@@ -5,11 +5,12 @@ import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
 import { Events } from "client/network";
 import { PlayerState } from "client/rodux/reducers";
-import { GetPetModel, Pet } from "shared/constants/Pets";
+import { GetPetModel, Pet, Rarity, createPetInstance, getPetClicks } from "shared/constants/Pets";
 
 interface Props {
 	pet: Pet;
 	name: string;
+	rarity: Rarity;
 	uuid: string;
 	equipped: boolean;
 	locked: boolean;
@@ -24,6 +25,15 @@ function PetInfoFrame(props: Props) {
 	const viewportRef = Roact.createRef<ViewportFrame>();
 	const renameButtonRef = Roact.createRef<ImageButton>();
 	const renameTextBoxRef = Roact.createRef<TextBox>();
+
+	const instance = createPetInstance({
+		name: props.name,
+		type: props.pet,
+		uuid: props.uuid,
+		rarity: props.rarity,
+		equipped: props.equipped,
+		locked: props.locked,
+	});
 
 	const model = GetPetModel(props.pet);
 
@@ -207,7 +217,7 @@ function PetInfoFrame(props: Props) {
 						Font={Enum.Font.GothamBold}
 						Position={new UDim2(0.25, 0, 0, 0)}
 						Size={new UDim2(0.75, 0, 1, 0)}
-						Text="x100M"
+						Text={tostring(getPetClicks(instance))}
 						TextColor3={Color3.fromRGB(247, 255, 166)}
 						TextScaled={true}
 						TextSize={14}

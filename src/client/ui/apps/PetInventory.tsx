@@ -3,7 +3,9 @@ import { StoreProvider } from "@rbxts/roact-rodux-hooked";
 import { clientStore } from "client/rodux/rodux";
 import {
 	PET_ACTION_BUTTONS,
+	PetActionButton,
 	PetInstance,
+	getBestPets,
 	getEquippedPets,
 	getMaxPetsEquipped,
 	getMaxPetsStored,
@@ -16,6 +18,7 @@ import { PlayerState } from "client/rodux/reducers";
 import Rodux from "@rbxts/rodux";
 import RoactRodux from "@rbxts/roact-rodux";
 import { useEffect, useState } from "@rbxts/roact-hooked";
+import { Events } from "client/network";
 
 interface Props {
 	pets: PetInstance[];
@@ -29,7 +32,7 @@ function PetInventory(props: Props) {
 	const [selectedPet, setSelectedPet] = useState<PetInstance>(undefined);
 
 	const actionButtons = PET_ACTION_BUTTONS.map((action) => {
-		return <ActionButton action={action} />;
+		return <ActionButton action={action} onClick={() => performAction(action)} />;
 	});
 	const petButtons = props.pets.map((pet) => {
 		return (
@@ -37,6 +40,7 @@ function PetInventory(props: Props) {
 				pet={pet.type}
 				uuid={pet.uuid}
 				name={pet.name}
+				rarity={pet.rarity}
 				onClick={() => {
 					if (isDeleteMode) print(true);
 					else setSelectedPet(pet);
@@ -122,7 +126,12 @@ function PetInventory(props: Props) {
 							/>
 						</scrollingframe>
 						{selectedPet && (
-							<PetInfoFrame pet={selectedPet.type} uuid={selectedPet.uuid} name={selectedPet.name} />
+							<PetInfoFrame
+								pet={selectedPet.type}
+								uuid={selectedPet.uuid}
+								name={selectedPet.name}
+								rarity={selectedPet.rarity}
+							/>
 						)}
 					</frame>
 					<textbutton
@@ -283,6 +292,37 @@ function PetInventory(props: Props) {
 			</screengui>
 		</StoreProvider>
 	);
+}
+
+function performAction(action: PetActionButton) {
+	switch (action) {
+		case "Equip Best": {
+			const bestPets = getBestPets(clientStore.getState());
+			const equippedPets = getEquippedPets(clientStore.getState());
+
+			for (const pet of equippedPets) {
+				if (!bestPets.includes(pet.uuid)) {
+					Events.petAction(pet.uuid, "Unequip");
+				} else {
+					bestPets.remove(bestPets.indexOf(pet.uuid));
+				}
+			}
+
+			for (const uuid of bestPets) {
+				Events.petAction(uuid, "Equip");
+			}
+			break;
+		}
+		case "Trash Mode":
+			break;
+		case "Mass Delete":
+			break;
+		case "Unequip All": {
+			const equippedPets = getEquippedPets(clientStore.getState());
+			for (const pet of equippedPets) Events.petAction(pet.uuid, "Unequip");
+			break;
+		}
+	}
 }
 
 function mapState(state: PlayerState, props: Props) {

@@ -5,6 +5,7 @@ local StoreProvider = TS.import(script, game:GetService("ReplicatedStorage"), "r
 local clientStore = TS.import(script, script.Parent.Parent.Parent, "rodux", "rodux").clientStore
 local _Pets = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets")
 local PET_ACTION_BUTTONS = _Pets.PET_ACTION_BUTTONS
+local getBestPets = _Pets.getBestPets
 local getEquippedPets = _Pets.getEquippedPets
 local getMaxPetsEquipped = _Pets.getMaxPetsEquipped
 local getMaxPetsStored = _Pets.getMaxPetsStored
@@ -16,12 +17,17 @@ local RoactRodux = TS.import(script, game:GetService("ReplicatedStorage"), "rbxt
 local _roact_hooked = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src")
 local useEffect = _roact_hooked.useEffect
 local useState = _roact_hooked.useState
+local Events = TS.import(script, script.Parent.Parent.Parent, "network").Events
+local performAction
 local function PetInventory(props)
 	local isDeleteMode, setDeleteMode = useState(false)
 	local selectedPet, setSelectedPet = useState(nil)
 	local _arg0 = function(action)
 		return Roact.createElement(ActionButton, {
 			action = action,
+			onClick = function()
+				return performAction(action)
+			end,
 		})
 	end
 	-- ▼ ReadonlyArray.map ▼
@@ -37,6 +43,7 @@ local function PetInventory(props)
 			pet = pet.type,
 			uuid = pet.uuid,
 			name = pet.name,
+			rarity = pet.rarity,
 			onClick = function()
 				if isDeleteMode then
 					print(true)
@@ -158,6 +165,7 @@ local function PetInventory(props)
 		pet = selectedPet.type,
 		uuid = selectedPet.uuid,
 		name = selectedPet.name,
+		rarity = selectedPet.rarity,
 	}))
 	if _child then
 		_children_3[_length_3 + 1] = _child
@@ -313,6 +321,41 @@ local function PetInventory(props)
 	_children_1[_length_1 + 1] = Roact.createElement("Frame", _attributes_2, _children_2)
 	_children.PetInventory = Roact.createElement("ScreenGui", _attributes_1, _children_1)
 	return Roact.createElement(StoreProvider, _attributes, _children)
+end
+function performAction(action)
+	repeat
+		if action == "Equip Best" then
+			local bestPets = getBestPets(clientStore:getState())
+			local equippedPets = getEquippedPets(clientStore:getState())
+			for _, pet in equippedPets do
+				local _uuid = pet.uuid
+				if not (table.find(bestPets, _uuid) ~= nil) then
+					Events.petAction(pet.uuid, "Unequip")
+				else
+					local _uuid_1 = pet.uuid
+					local _arg0 = (table.find(bestPets, _uuid_1) or 0) - 1
+					table.remove(bestPets, _arg0 + 1)
+				end
+			end
+			for _, uuid in bestPets do
+				Events.petAction(uuid, "Equip")
+			end
+			break
+		end
+		if action == "Trash Mode" then
+			break
+		end
+		if action == "Mass Delete" then
+			break
+		end
+		if action == "Unequip All" then
+			local equippedPets = getEquippedPets(clientStore:getState())
+			for _, pet in equippedPets do
+				Events.petAction(pet.uuid, "Unequip")
+			end
+			break
+		end
+	until true
 end
 local function mapState(state, props)
 	return {

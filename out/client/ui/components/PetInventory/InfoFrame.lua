@@ -9,7 +9,10 @@ local _viewport_model = TS.import(script, game:GetService("ReplicatedStorage"), 
 local CleanViewport = _viewport_model.CleanViewport
 local GenerateViewport = _viewport_model.GenerateViewport
 local Events = TS.import(script, script.Parent.Parent.Parent.Parent, "network").Events
-local GetPetModel = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets").GetPetModel
+local _Pets = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets")
+local GetPetModel = _Pets.GetPetModel
+local createPetInstance = _Pets.createPetInstance
+local getPetClicks = _Pets.getPetClicks
 local function PetInfoFrame(props)
 	local isEquipped = props.equipped
 	local isLocked = props.locked
@@ -18,6 +21,14 @@ local function PetInfoFrame(props)
 	local viewportRef = Roact.createRef()
 	local renameButtonRef = Roact.createRef()
 	local renameTextBoxRef = Roact.createRef()
+	local instance = createPetInstance({
+		name = props.name,
+		type = props.pet,
+		uuid = props.uuid,
+		rarity = props.rarity,
+		equipped = props.equipped,
+		locked = props.locked,
+	})
 	local model = GetPetModel(props.pet)
 	-- Have to use this because we can't use the hook before it is set
 	useEffect(function()
@@ -195,7 +206,7 @@ local function PetInfoFrame(props)
 						Font = Enum.Font.GothamBold,
 						Position = UDim2.new(0.25, 0, 0, 0),
 						Size = UDim2.new(0.75, 0, 1, 0),
-						Text = "x100M",
+						Text = tostring(getPetClicks(instance)),
 						TextColor3 = Color3.fromRGB(247, 255, 166),
 						TextScaled = true,
 						TextSize = 14,

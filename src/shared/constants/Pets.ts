@@ -1,3 +1,4 @@
+import { Event } from "@rbxts/roact";
 import { ReplicatedStorage } from "@rbxts/services";
 import { PlayerData } from "shared/types/PlayerData";
 
@@ -22,6 +23,34 @@ export interface PetInstance {
 	equipped?: boolean;
 }
 
+type PetClickRarity = Record<Rarity, number>;
+
+const DEFAULT_PET_RARITY_PROPS: PetClickRarity = {
+	Common: 10,
+	Uncommon: 20,
+	Rare: 50,
+};
+
+interface PetProps {
+	clicks: PetClickRarity;
+}
+
+export const PET_CONFIG: Record<Pet, PetProps> = {
+	Dog: {
+		clicks: DEFAULT_PET_RARITY_PROPS,
+	},
+	Cat: {
+		clicks: DEFAULT_PET_RARITY_PROPS,
+	},
+	Turtle: {
+		clicks: {
+			Common: 15,
+			Uncommon: 30,
+			Rare: 75,
+		},
+	},
+};
+
 export type PetInventory = Record<string, PetInstance>;
 
 export const RARITIES = ["Common", "Uncommon", "Rare"] as const;
@@ -33,9 +62,30 @@ export const RARITY_COLORS: Record<Rarity, Color3> = {
 	Rare: Color3.fromRGB(51, 222, 227),
 };
 
+export function createPetInstance(petInstance: Partial<PetInstance>): PetInstance {
+	return {
+		uuid: petInstance.uuid ?? "", // Provide default values if needed
+		type: petInstance.type ?? "Dog",
+		name: petInstance.name ?? "Dog",
+		rarity: petInstance.rarity ?? "Common",
+		locked: petInstance.locked === undefined ? false : petInstance.locked,
+		equipped: petInstance.equipped === undefined ? false : petInstance.equipped,
+	};
+}
+
 export function GetPetModel(pet: Pet) {
 	const petModels = ReplicatedStorage.Pets;
 	return petModels.FindFirstChild(pet) as Model;
+}
+
+export function getPetClicks(pet: PetInstance) {
+	let amount = 0;
+
+	const petConfig = PET_CONFIG[pet.type];
+	const rarityClicks = petConfig.clicks[pet.rarity];
+	if (rarityClicks) amount += rarityClicks;
+
+	return amount;
 }
 
 export function getMaxPetsEquipped(data: PlayerData) {
@@ -58,4 +108,22 @@ export function getEquippedPets(data: PlayerData) {
 		if (data.petInventory[uuid].equipped) equipped.push(instance);
 	}
 	return equipped;
+}
+
+export function getBestPets(data: PlayerData) {
+	const allPets: { uuid: string; power: number }[] = [];
+	for (const [uuid, instance] of pairs(data.petInventory)) {
+		const power = getPetClicks(instance);
+		allPets.push({ uuid: uuid, power: power });
+	}
+
+	allPets.sort((a, b) => {
+		return a.power > b.power;
+	});
+
+	const maxEquipped = getMaxPetsEquipped(data);
+	const topPets: string[] = [];
+	for (let x = 0; x < maxEquipped; x++) topPets.insert(x, allPets[x].uuid);
+
+	return topPets;
 }

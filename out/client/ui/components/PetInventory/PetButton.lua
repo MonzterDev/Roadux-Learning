@@ -4,7 +4,10 @@ local Roact = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_inc
 local useEffect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-hooked", "src").useEffect
 local RoactRodux = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "roact-rodux", "src")
 local GenerateViewport = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "viewport-model", "src").GenerateViewport
-local GetPetModel = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets").GetPetModel
+local _Pets = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "Pets")
+local GetPetModel = _Pets.GetPetModel
+local createPetInstance = _Pets.createPetInstance
+local getPetClicks = _Pets.getPetClicks
 local function PetButton(props)
 	local isEquipped = props.equipped
 	local viewportRef = Roact.createRef()
@@ -52,7 +55,13 @@ local function PetButton(props)
 				Font = Enum.Font.GothamBold,
 				Position = UDim2.new(0.5, 0, 0.687, 0),
 				Size = UDim2.new(0.9, 0, 0.313, 0),
-				Text = "999.99M",
+				Text = tostring(getPetClicks(createPetInstance({
+					uuid = props.uuid,
+					type = props.pet,
+					name = props.name,
+					rarity = props.rarity,
+					equipped = isEquipped,
+				}))),
 				TextColor3 = Color3.fromRGB(255, 255, 127),
 				TextScaled = true,
 				TextSize = 14,

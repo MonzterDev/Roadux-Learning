@@ -3,6 +3,8 @@ import { PetActionButton } from "shared/constants/Pets";
 
 interface Props {
 	action: PetActionButton;
+
+	onClick: () => void;
 }
 
 function ActionButton(props: Props) {
@@ -15,6 +17,9 @@ function ActionButton(props: Props) {
 			Text={""}
 			TextColor3={Color3.fromRGB(0, 0, 0)}
 			TextSize={14}
+			Event={{
+				MouseButton1Click: props.onClick,
+			}}
 		>
 			<uicorner CornerRadius={new UDim(0.2, 0)} />
 			<imagelabel

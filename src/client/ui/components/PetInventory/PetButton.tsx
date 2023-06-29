@@ -4,12 +4,13 @@ import RoactRodux from "@rbxts/roact-rodux";
 import Rodux from "@rbxts/rodux";
 import { GenerateViewport } from "@rbxts/viewport-model";
 import { PlayerState } from "client/rodux/reducers";
-import { GetPetModel, Pet } from "shared/constants/Pets";
+import { GetPetModel, Pet, Rarity, createPetInstance, getPetClicks } from "shared/constants/Pets";
 
 interface Props {
 	pet: Pet;
 	name: string;
 	uuid: string;
+	rarity: Rarity;
 	equipped: boolean;
 
 	onClick: () => void;
@@ -63,7 +64,17 @@ function PetButton(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.687, 0)}
 				Size={new UDim2(0.9, 0, 0.313, 0)}
-				Text="999.99M"
+				Text={tostring(
+					getPetClicks(
+						createPetInstance({
+							uuid: props.uuid,
+							type: props.pet,
+							name: props.name,
+							rarity: props.rarity,
+							equipped: isEquipped,
+						}),
+					),
+				)}
 				TextColor3={Color3.fromRGB(255, 255, 127)}
 				TextScaled={true}
 				TextSize={14}
