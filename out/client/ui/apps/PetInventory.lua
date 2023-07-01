@@ -9,6 +9,7 @@ local getBestPets = _Pets.getBestPets
 local getEquippedPets = _Pets.getEquippedPets
 local getMaxPetsEquipped = _Pets.getMaxPetsEquipped
 local getMaxPetsStored = _Pets.getMaxPetsStored
+local getPetClicks = _Pets.getPetClicks
 local ActionButton = TS.import(script, script.Parent.Parent, "components", "PetInventory", "ActionButton").default
 local Object = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "object-utils")
 local PetButton = TS.import(script, script.Parent.Parent, "components", "PetInventory", "PetButton").default
@@ -39,21 +40,33 @@ local function PetInventory(props)
 	end
 	-- ▲ ReadonlyArray.map ▲
 	local actionButtons = _newValue
-	local _pets = props.pets
-	local _arg0_1 = function(pet)
+	local _exp = Object.values(props.pets)
+	local _arg0_1 = function(a, b)
+		if a.equipped and not b.equipped then
+			return true
+		end
+		if not a.equipped and b.equipped then
+			return false
+		end
+		local aClicks = getPetClicks(a)
+		local bClicks = getPetClicks(b)
+		return aClicks > bClicks
+	end
+	table.sort(_exp, _arg0_1)
+	local _arg0_2 = function(pet, index)
 		local _attributes = {
 			pet = pet.type,
 			uuid = pet.uuid,
 			name = pet.name,
 			rarity = pet.rarity,
 		}
-		local _exp = string.lower(pet.name)
-		local _arg0_2 = string.lower(searchString)
-		local _condition = (string.find(_exp, _arg0_2)) ~= nil
+		local _exp_1 = string.lower(pet.name)
+		local _arg0_3 = string.lower(searchString)
+		local _condition = (string.find(_exp_1, _arg0_3)) ~= nil
 		if not _condition then
-			local _exp_1 = string.lower(pet.type)
-			local _arg0_3 = string.lower(searchString)
-			_condition = (string.find(_exp_1, _arg0_3)) ~= nil
+			local _exp_2 = string.lower(pet.type)
+			local _arg0_4 = string.lower(searchString)
+			_condition = (string.find(_exp_2, _arg0_4)) ~= nil
 			if not _condition then
 				_condition = string.lower(searchString) == ""
 			end
@@ -66,12 +79,13 @@ local function PetInventory(props)
 				setSelectedPet(pet)
 			end
 		end
+		_attributes.layoutOrder = index
 		return Roact.createElement(PetButton, _attributes)
 	end
 	-- ▼ ReadonlyArray.map ▼
-	local _newValue_1 = table.create(#_pets)
-	for _k, _v in _pets do
-		_newValue_1[_k] = _arg0_1(_v, _k - 1, _pets)
+	local _newValue_1 = table.create(#_exp)
+	for _k, _v in _exp do
+		_newValue_1[_k] = _arg0_2(_v, _k - 1, _exp)
 	end
 	-- ▲ ReadonlyArray.map ▲
 	local petButtons = _newValue_1

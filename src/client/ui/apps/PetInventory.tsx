@@ -10,6 +10,7 @@ import {
 	getEquippedPets,
 	getMaxPetsEquipped,
 	getMaxPetsStored,
+	getPetClicks,
 } from "shared/constants/Pets";
 import ActionButton from "../components/PetInventory/ActionButton";
 import Object from "@rbxts/object-utils";
@@ -38,25 +39,35 @@ function PetInventory(props: Props) {
 	const actionButtons = PET_ACTION_BUTTONS.map((action) => {
 		return <ActionButton action={action} onClick={() => performAction(action)} />;
 	});
-	const petButtons = props.pets.map((pet) => {
-		return (
-			<PetButton
-				pet={pet.type}
-				uuid={pet.uuid}
-				name={pet.name}
-				rarity={pet.rarity}
-				visible={
-					pet.name.lower().find(searchString.lower())[0] !== undefined ||
-					pet.type.lower().find(searchString.lower())[0] !== undefined ||
-					searchString.lower() === ""
-				}
-				onClick={() => {
-					if (isDeleteMode) print(true);
-					else setSelectedPet(pet);
-				}}
-			/>
-		);
-	});
+	const petButtons = Object.values(props.pets)
+		.sort((a, b) => {
+			if (a.equipped && !b.equipped) return true;
+			if (!a.equipped && b.equipped) return false;
+
+			const aClicks = getPetClicks(a);
+			const bClicks = getPetClicks(b);
+			return aClicks > bClicks;
+		})
+		.map((pet, index) => {
+			return (
+				<PetButton
+					pet={pet.type}
+					uuid={pet.uuid}
+					name={pet.name}
+					rarity={pet.rarity}
+					visible={
+						pet.name.lower().find(searchString.lower())[0] !== undefined ||
+						pet.type.lower().find(searchString.lower())[0] !== undefined ||
+						searchString.lower() === ""
+					}
+					onClick={() => {
+						if (isDeleteMode) print(true);
+						else setSelectedPet(pet);
+					}}
+					layoutOrder={index}
+				/>
+			);
+		});
 
 	useEffect(() => {
 		if (selectedPet) {

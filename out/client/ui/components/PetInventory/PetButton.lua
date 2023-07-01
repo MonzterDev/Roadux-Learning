@@ -33,6 +33,7 @@ local function PetButton(props)
 			TextSize = 14,
 			Visible = props.visible,
 			[Roact.Event.MouseButton1Click] = props.onClick,
+			LayoutOrder = props.layoutOrder,
 		}, {
 			Roact.createElement("UICorner", {
 				CornerRadius = UDim.new(0.1, 0),

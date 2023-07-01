@@ -14,6 +14,7 @@ interface Props {
 	equipped: boolean;
 
 	visible: boolean;
+	layoutOrder: number;
 
 	onClick: () => void;
 }
@@ -44,6 +45,7 @@ function PetButton(props: Props) {
 			TextSize={14}
 			Visible={props.visible}
 			Event={{ MouseButton1Click: props.onClick }}
+			LayoutOrder={props.layoutOrder}
 		>
 			<uicorner CornerRadius={new UDim(0.1, 0)} />
 			<textlabel
