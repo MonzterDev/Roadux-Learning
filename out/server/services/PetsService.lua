@@ -143,7 +143,7 @@ do
 		Events.petAction(player, uuid, "Unlock")
 	end
 	function PetsService:renamePet(player, uuid, name)
-		if #name > 1 and #name < 25 then
+		if #name <= 1 and #name > 25 then
 			return nil
 		end
 		local profile = self.playerDataService:getProfile(player)

@@ -114,7 +114,7 @@ export class PetsService implements OnStart {
 	}
 
 	private renamePet(player: Player, uuid: string, name: string) {
-		if (name.size() > 1 && name.size() < 25) return;
+		if (name.size() <= 1 && name.size() > 25) return;
 
 		const profile = this.playerDataService.getProfile(player);
 		if (!profile) return;

@@ -92,8 +92,8 @@ function PetInfoFrame(props: Props) {
 
 						if (enterPressed && textBox.Text.size() > 1 && textBox.Text.size() < 25)
 							Events.renamePet(props.uuid, textBox.Text);
-						setIsRenaming(false);
 
+						setIsRenaming(false);
 						textBox.Text = "";
 					},
 				}}
