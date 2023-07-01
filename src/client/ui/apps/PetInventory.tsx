@@ -30,9 +30,10 @@ interface Props {
 }
 
 function PetInventory(props: Props) {
-	const [isDeleteMode, setDeleteMode] = useState(false);
+	const [isTrashMode, setTrashMode] = useState(false);
 	const [selectedPet, setSelectedPet] = useState<PetInstance>(undefined);
 	const [searchString, setSearchString] = useState<string>("");
+	const [petsToTrash, setPetsToTrash] = useState<string[]>([]);
 
 	const searchBoxRef = Roact.createRef<TextBox>();
 
@@ -55,14 +56,22 @@ function PetInventory(props: Props) {
 					uuid={pet.uuid}
 					name={pet.name}
 					rarity={pet.rarity}
+					selectedToDelete={isTrashMode && petsToTrash.includes(pet.uuid)}
 					visible={
 						pet.name.lower().find(searchString.lower())[0] !== undefined ||
 						pet.type.lower().find(searchString.lower())[0] !== undefined ||
 						searchString.lower() === ""
 					}
 					onClick={() => {
-						if (isDeleteMode) print(true);
-						else setSelectedPet(pet);
+						if (isTrashMode) {
+							if (petsToTrash.includes(pet.uuid)) {
+								const index = petsToTrash.indexOf(pet.uuid);
+								petsToTrash.remove(index);
+								setPetsToTrash([...petsToTrash]);
+							} else {
+								setPetsToTrash([...petsToTrash, pet.uuid]);
+							}
+						} else setSelectedPet(pet);
 					}}
 					layoutOrder={index}
 				/>
@@ -75,6 +84,45 @@ function PetInventory(props: Props) {
 			if (!petInInventory) setSelectedPet(undefined);
 		}
 	});
+
+	function performAction(action: PetActionButton) {
+		switch (action) {
+			case "Equip Best": {
+				const bestPets = getBestPets(clientStore.getState());
+				const equippedPets = getEquippedPets(clientStore.getState());
+
+				for (const pet of equippedPets) {
+					if (!bestPets.includes(pet.uuid)) {
+						Events.petAction(pet.uuid, "Unequip");
+					} else {
+						bestPets.remove(bestPets.indexOf(pet.uuid));
+					}
+				}
+
+				for (const uuid of bestPets) {
+					Events.petAction(uuid, "Equip");
+				}
+				break;
+			}
+			case "Trash Mode":
+				if (isTrashMode && petsToTrash.size() > 0) {
+					for (const uuid of petsToTrash) Events.petAction(uuid, "Delete");
+				}
+				setTrashMode(!isTrashMode);
+				break;
+			case "Mass Delete":
+				break;
+			case "Unequip All": {
+				const equippedPets = getEquippedPets(clientStore.getState());
+				for (const pet of equippedPets) Events.petAction(pet.uuid, "Unequip");
+				break;
+			}
+		}
+		if (isTrashMode && action !== "Trash Mode") {
+			setTrashMode(false);
+			setPetsToTrash([]);
+		}
+	}
 
 	return (
 		<StoreProvider store={clientStore}>
@@ -144,7 +192,7 @@ function PetInventory(props: Props) {
 								SortOrder={Enum.SortOrder.LayoutOrder}
 							/>
 						</scrollingframe>
-						{selectedPet && (
+						{!isTrashMode && selectedPet && (
 							<PetInfoFrame
 								pet={selectedPet.type}
 								uuid={selectedPet.uuid}
@@ -315,37 +363,6 @@ function PetInventory(props: Props) {
 			</screengui>
 		</StoreProvider>
 	);
-}
-
-function performAction(action: PetActionButton) {
-	switch (action) {
-		case "Equip Best": {
-			const bestPets = getBestPets(clientStore.getState());
-			const equippedPets = getEquippedPets(clientStore.getState());
-
-			for (const pet of equippedPets) {
-				if (!bestPets.includes(pet.uuid)) {
-					Events.petAction(pet.uuid, "Unequip");
-				} else {
-					bestPets.remove(bestPets.indexOf(pet.uuid));
-				}
-			}
-
-			for (const uuid of bestPets) {
-				Events.petAction(uuid, "Equip");
-			}
-			break;
-		}
-		case "Trash Mode":
-			break;
-		case "Mass Delete":
-			break;
-		case "Unequip All": {
-			const equippedPets = getEquippedPets(clientStore.getState());
-			for (const pet of equippedPets) Events.petAction(pet.uuid, "Unequip");
-			break;
-		}
-	}
 }
 
 function mapState(state: PlayerState, props: Props) {

@@ -19,12 +19,13 @@ local _roact_hooked = TS.import(script, game:GetService("ReplicatedStorage"), "r
 local useEffect = _roact_hooked.useEffect
 local useState = _roact_hooked.useState
 local Events = TS.import(script, script.Parent.Parent.Parent, "network").Events
-local performAction
 local function PetInventory(props)
-	local isDeleteMode, setDeleteMode = useState(false)
+	local isTrashMode, setTrashMode = useState(false)
 	local selectedPet, setSelectedPet = useState(nil)
 	local searchString, setSearchString = useState("")
+	local petsToTrash, setPetsToTrash = useState({})
 	local searchBoxRef = Roact.createRef()
+	local performAction
 	local _arg0 = function(action)
 		return Roact.createElement(ActionButton, {
 			action = action,
@@ -60,21 +61,44 @@ local function PetInventory(props)
 			name = pet.name,
 			rarity = pet.rarity,
 		}
+		local _condition = isTrashMode
+		if _condition then
+			local _uuid = pet.uuid
+			_condition = table.find(petsToTrash, _uuid) ~= nil
+		end
+		_attributes.selectedToDelete = _condition
 		local _exp_1 = string.lower(pet.name)
 		local _arg0_3 = string.lower(searchString)
-		local _condition = (string.find(_exp_1, _arg0_3)) ~= nil
-		if not _condition then
+		local _condition_1 = (string.find(_exp_1, _arg0_3)) ~= nil
+		if not _condition_1 then
 			local _exp_2 = string.lower(pet.type)
 			local _arg0_4 = string.lower(searchString)
-			_condition = (string.find(_exp_2, _arg0_4)) ~= nil
-			if not _condition then
-				_condition = string.lower(searchString) == ""
+			_condition_1 = (string.find(_exp_2, _arg0_4)) ~= nil
+			if not _condition_1 then
+				_condition_1 = string.lower(searchString) == ""
 			end
 		end
-		_attributes.visible = _condition
+		_attributes.visible = _condition_1
 		_attributes.onClick = function()
-			if isDeleteMode then
-				print(true)
+			if isTrashMode then
+				local _uuid = pet.uuid
+				if table.find(petsToTrash, _uuid) ~= nil then
+					local _uuid_1 = pet.uuid
+					local index = (table.find(petsToTrash, _uuid_1) or 0) - 1
+					table.remove(petsToTrash, index + 1)
+					local _array = {}
+					local _length = #_array
+					table.move(petsToTrash, 1, #petsToTrash, _length + 1, _array)
+					setPetsToTrash(_array)
+				else
+					local _array = {}
+					local _length = #_array
+					local _petsToTrashLength = #petsToTrash
+					table.move(petsToTrash, 1, _petsToTrashLength, _length + 1, _array)
+					_length += _petsToTrashLength
+					_array[_length + 1] = pet.uuid
+					setPetsToTrash(_array)
+				end
 			else
 				setSelectedPet(pet)
 			end
@@ -97,6 +121,51 @@ local function PetInventory(props)
 			end
 		end
 	end)
+	function performAction(action)
+		repeat
+			if action == "Equip Best" then
+				local bestPets = getBestPets(clientStore:getState())
+				local equippedPets = getEquippedPets(clientStore:getState())
+				for _, pet in equippedPets do
+					local _uuid = pet.uuid
+					if not (table.find(bestPets, _uuid) ~= nil) then
+						Events.petAction(pet.uuid, "Unequip")
+					else
+						local _uuid_1 = pet.uuid
+						local _arg0_3 = (table.find(bestPets, _uuid_1) or 0) - 1
+						table.remove(bestPets, _arg0_3 + 1)
+					end
+				end
+				for _, uuid in bestPets do
+					Events.petAction(uuid, "Equip")
+				end
+				break
+			end
+			if action == "Trash Mode" then
+				if isTrashMode and #petsToTrash > 0 then
+					for _, uuid in petsToTrash do
+						Events.petAction(uuid, "Delete")
+					end
+				end
+				setTrashMode(not isTrashMode)
+				break
+			end
+			if action == "Mass Delete" then
+				break
+			end
+			if action == "Unequip All" then
+				local equippedPets = getEquippedPets(clientStore:getState())
+				for _, pet in equippedPets do
+					Events.petAction(pet.uuid, "Unequip")
+				end
+				break
+			end
+		until true
+		if isTrashMode and action ~= "Trash Mode" then
+			setTrashMode(false)
+			setPetsToTrash({})
+		end
+	end
 	local _attributes = {
 		store = clientStore,
 	}
@@ -189,12 +258,12 @@ local function PetInventory(props)
 		SortOrder = Enum.SortOrder.LayoutOrder,
 	})
 	_children_3.Container = Roact.createElement("ScrollingFrame", _attributes_5, _children_5)
-	local _child = selectedPet and (Roact.createElement(PetInfoFrame, {
+	local _child = not isTrashMode and (selectedPet and (Roact.createElement(PetInfoFrame, {
 		pet = selectedPet.type,
 		uuid = selectedPet.uuid,
 		name = selectedPet.name,
 		rarity = selectedPet.rarity,
-	}))
+	})))
 	if _child then
 		_children_3[_length_3 + 1] = _child
 	end
@@ -353,41 +422,6 @@ local function PetInventory(props)
 	_children_1[_length_1 + 1] = Roact.createElement("Frame", _attributes_2, _children_2)
 	_children.PetInventory = Roact.createElement("ScreenGui", _attributes_1, _children_1)
 	return Roact.createElement(StoreProvider, _attributes, _children)
-end
-function performAction(action)
-	repeat
-		if action == "Equip Best" then
-			local bestPets = getBestPets(clientStore:getState())
-			local equippedPets = getEquippedPets(clientStore:getState())
-			for _, pet in equippedPets do
-				local _uuid = pet.uuid
-				if not (table.find(bestPets, _uuid) ~= nil) then
-					Events.petAction(pet.uuid, "Unequip")
-				else
-					local _uuid_1 = pet.uuid
-					local _arg0 = (table.find(bestPets, _uuid_1) or 0) - 1
-					table.remove(bestPets, _arg0 + 1)
-				end
-			end
-			for _, uuid in bestPets do
-				Events.petAction(uuid, "Equip")
-			end
-			break
-		end
-		if action == "Trash Mode" then
-			break
-		end
-		if action == "Mass Delete" then
-			break
-		end
-		if action == "Unequip All" then
-			local equippedPets = getEquippedPets(clientStore:getState())
-			for _, pet in equippedPets do
-				Events.petAction(pet.uuid, "Unequip")
-			end
-			break
-		end
-	until true
 end
 local function mapState(state, props)
 	return {

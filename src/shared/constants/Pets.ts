@@ -112,6 +112,7 @@ export function getEquippedPets(data: PlayerData) {
 
 export function getBestPets(data: PlayerData) {
 	const allPets: { uuid: string; power: number }[] = [];
+
 	for (const [uuid, instance] of pairs(data.petInventory)) {
 		const power = getPetClicks(instance);
 		allPets.push({ uuid: uuid, power: power });
@@ -121,7 +122,7 @@ export function getBestPets(data: PlayerData) {
 		return a.power > b.power;
 	});
 
-	const maxEquipped = getMaxPetsEquipped(data);
+	const maxEquipped = allPets.size() > getMaxPetsEquipped(data) ? getMaxPetsEquipped(data) : allPets.size();
 	const topPets: string[] = [];
 	for (let x = 0; x < maxEquipped; x++) topPets.insert(x, allPets[x].uuid);
 

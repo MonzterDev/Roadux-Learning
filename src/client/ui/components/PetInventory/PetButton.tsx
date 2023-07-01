@@ -13,6 +13,8 @@ interface Props {
 	rarity: Rarity;
 	equipped: boolean;
 
+	selectedToDelete: boolean;
+
 	visible: boolean;
 	layoutOrder: number;
 
@@ -114,7 +116,7 @@ function PetButton(props: Props) {
 				TextScaled={true}
 				TextSize={14}
 				TextWrapped={true}
-				Visible={false}
+				Visible={props.selectedToDelete}
 				ZIndex={2}
 			/>
 		</textbutton>

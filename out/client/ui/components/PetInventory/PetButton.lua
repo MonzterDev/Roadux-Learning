@@ -96,7 +96,7 @@ local function PetButton(props)
 				TextScaled = true,
 				TextSize = 14,
 				TextWrapped = true,
-				Visible = false,
+				Visible = props.selectedToDelete,
 				ZIndex = 2,
 			}),
 		}),

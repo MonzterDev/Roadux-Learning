@@ -100,7 +100,7 @@ local function getBestPets(data)
 		return a.power > b.power
 	end
 	table.sort(allPets, _arg0)
-	local maxEquipped = getMaxPetsEquipped(data)
+	local maxEquipped = if #allPets > getMaxPetsEquipped(data) then getMaxPetsEquipped(data) else #allPets
 	local topPets = {}
 	do
 		local x = 0
