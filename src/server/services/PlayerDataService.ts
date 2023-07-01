@@ -54,7 +54,6 @@ export class PlayerDataService implements OnInit {
 		profile.Reconcile();
 
 		this.profiles.set(player, profile);
-		Events.updateData.fire(player, HttpService.JSONEncode(profile.Data));
 	}
 
 	private removeProfile(player: Player) {

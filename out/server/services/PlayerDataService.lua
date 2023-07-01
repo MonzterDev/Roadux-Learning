@@ -70,7 +70,6 @@ do
 		local _profiles = self.profiles
 		local _player = player
 		_profiles[_player] = profile
-		Events.updateData:fire(player, HttpService:JSONEncode(profile.Data))
 	end
 	function PlayerDataService:removeProfile(player)
 		local _profiles = self.profiles

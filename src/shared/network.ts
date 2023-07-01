@@ -16,7 +16,6 @@ interface ServerFunctions {
 }
 
 interface ClientEvents {
-	updateData: (data: string) => void; // Using this because Flamework's Guards can be unreliable with large tables
 	updateTaps: (amount: number) => void;
 
 	replicatePlayerState: (action: string) => void;

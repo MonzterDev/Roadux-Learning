@@ -5,19 +5,16 @@ local Events = TS.import(script, script.Parent.Parent, "network").Events
 local dataReducer = TS.import(script, script.Parent, "reducers").dataReducer
 local PlayerDataKeys = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "types", "Rodux").PlayerDataKeys
 local DEFAULT_PLAYER_DATA = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "PlayerData").DEFAULT_PLAYER_DATA
+local HttpService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").HttpService
 local clientStore = Store.new(dataReducer)
 clientStore:dispatch({
 	type = PlayerDataKeys.init,
 	data = DEFAULT_PLAYER_DATA,
 })
--- Events.replicatePlayerState.connect((action) => {
--- const data = <DataActions>HttpService.JSONDecode(action);
--- clientStore.dispatch(data);
--- });
--- Events.updateData.connect((data) => {
--- const playerData = <PlayerData>HttpService.JSONDecode(data);
--- clientStore.dispatch({ type: PlayerDataKeys.init, data: playerData });
--- });
+Events.replicatePlayerState:connect(function(action)
+	local data = HttpService:JSONDecode(action)
+	clientStore:dispatch(data)
+end)
 Events.petAction:connect(function(uuid, action)
 	repeat
 		if action == "Equip" then

@@ -10,7 +10,6 @@ local GlobalEvents = createNetworkingEvent("shared/network@GlobalEvents", {
 	renamePet = { { t.string, t.string }, nil },
 	deleteAllPets = { {}, nil },
 }, {
-	updateData = { { t.string }, nil },
 	updateTaps = { { t.number }, nil },
 	replicatePlayerState = { { t.string }, nil },
 	givePet = { { t.interface({
