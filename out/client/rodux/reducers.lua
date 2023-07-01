@@ -2,11 +2,9 @@
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local createReducer = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rodux", "src").createReducer
 local DEFAULT_PLAYER_DATA = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "constants", "PlayerData").DEFAULT_PLAYER_DATA
--- Define the `init` function
 local function init(state, action)
 	return action.data
 end
--- Define the `updateCurrency` function
 local function updateCurrency(state, action)
 	state[action.currency] = action.amount
 	return state

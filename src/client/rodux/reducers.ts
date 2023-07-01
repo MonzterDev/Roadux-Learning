@@ -9,7 +9,6 @@ interface UpdateDataAction extends Action<PlayerDataKeys.init> {
 	data: DataState;
 }
 
-// Define the `init` function
 export function init(state: DataState, action: UpdateDataAction): DataState {
 	return action.data;
 }
@@ -19,7 +18,6 @@ interface UpdateCurrencyAction extends Action<PlayerDataKeys.updateCurrency> {
 	currency: ExtractKeys<PlayerData, number>;
 }
 
-// Define the `updateCurrency` function
 export function updateCurrency(state: DataState, action: UpdateCurrencyAction): DataState {
 	state[action.currency] = action.amount;
 	return state;
