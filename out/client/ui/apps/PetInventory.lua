@@ -151,6 +151,7 @@ local function PetInventory(props)
 				break
 			end
 			if action == "Mass Delete" then
+				Events.deleteAllPets()
 				break
 			end
 			if action == "Unequip All" then

@@ -8,6 +8,7 @@ interface ServerEvents {
 
 	petAction: (uuid: string, action: PetAction) => void;
 	renamePet: (uuid: string, name: string) => void;
+	deleteAllPets: () => void;
 }
 
 interface ServerFunctions {

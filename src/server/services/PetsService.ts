@@ -33,6 +33,7 @@ export class PetsService implements OnStart {
 			}
 		});
 		Events.renamePet.connect((player, uuid, name) => this.renamePet(player, uuid, name));
+		Events.deleteAllPets.connect((player) => this.deleteAllPets(player));
 
 		task.delay(5, () => {
 			print("giving pet");
@@ -80,12 +81,13 @@ export class PetsService implements OnStart {
 	}
 
 	private deletePet(player: Player, uuid: string) {
-		print("Delete");
 		const profile = this.playerDataService.getProfile(player);
 		if (!profile) return;
 
 		const pet = profile.data.petInventory[uuid];
 		if (!pet) return;
+
+		if (pet.locked) return;
 
 		profile.data.petInventory[uuid] = undefined as never as PetInstance;
 		Events.petAction(player, uuid, "Delete");
@@ -129,5 +131,12 @@ export class PetsService implements OnStart {
 		).GetNonChatStringForBroadcastAsync();
 		pet.name = filteredName;
 		Events.renamePet(player, uuid, name);
+	}
+
+	private deleteAllPets(player: Player) {
+		const profile = this.playerDataService.getProfile(player);
+		if (!profile) return;
+
+		for (const [uuid, instance] of pairs(profile.data.petInventory)) this.deletePet(player, uuid);
 	}
 }

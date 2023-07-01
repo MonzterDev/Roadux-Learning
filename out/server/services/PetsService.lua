@@ -54,6 +54,9 @@ do
 		Events.renamePet:connect(function(player, uuid, name)
 			return self:renamePet(player, uuid, name)
 		end)
+		Events.deleteAllPets:connect(function(player)
+			return self:deleteAllPets(player)
+		end)
 		task.delay(5, function()
 			print("giving pet")
 			local _exp = Players:GetPlayers()
@@ -106,13 +109,15 @@ do
 		Events.petAction(player, uuid, "Unequip")
 	end
 	function PetsService:deletePet(player, uuid)
-		print("Delete")
 		local profile = self.playerDataService:getProfile(player)
 		if not profile then
 			return nil
 		end
 		local pet = profile.data.petInventory[uuid]
 		if not pet then
+			return nil
+		end
+		if pet.locked then
 			return nil
 		end
 		profile.data.petInventory[uuid] = nil
@@ -157,6 +162,15 @@ do
 		local filteredName = TextService:FilterStringAsync(name, player.UserId, Enum.TextFilterContext.PublicChat):GetNonChatStringForBroadcastAsync()
 		pet.name = filteredName
 		Events.renamePet(player, uuid, name)
+	end
+	function PetsService:deleteAllPets(player)
+		local profile = self.playerDataService:getProfile(player)
+		if not profile then
+			return nil
+		end
+		for uuid, instance in pairs(profile.data.petInventory) do
+			self:deletePet(player, uuid)
+		end
 	end
 end
 -- (Flamework) PetsService metadata

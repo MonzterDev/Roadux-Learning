@@ -111,6 +111,7 @@ function PetInventory(props: Props) {
 				setTrashMode(!isTrashMode);
 				break;
 			case "Mass Delete":
+				Events.deleteAllPets();
 				break;
 			case "Unequip All": {
 				const equippedPets = getEquippedPets(clientStore.getState());
