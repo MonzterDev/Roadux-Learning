@@ -68,9 +68,7 @@ function PetInventory(props: Props) {
 								const index = petsToTrash.indexOf(pet.uuid);
 								petsToTrash.remove(index);
 								setPetsToTrash([...petsToTrash]);
-							} else {
-								setPetsToTrash([...petsToTrash, pet.uuid]);
-							}
+							} else setPetsToTrash([...petsToTrash, pet.uuid]);
 						} else setSelectedPet(pet);
 					}}
 					layoutOrder={index}
@@ -92,16 +90,12 @@ function PetInventory(props: Props) {
 				const equippedPets = getEquippedPets(clientStore.getState());
 
 				for (const pet of equippedPets) {
-					if (!bestPets.includes(pet.uuid)) {
-						Events.petAction(pet.uuid, "Unequip");
-					} else {
-						bestPets.remove(bestPets.indexOf(pet.uuid));
-					}
+					if (!bestPets.includes(pet.uuid)) Events.petAction(pet.uuid, "Unequip");
+					else bestPets.remove(bestPets.indexOf(pet.uuid));
 				}
 
-				for (const uuid of bestPets) {
-					Events.petAction(uuid, "Equip");
-				}
+				for (const uuid of bestPets) Events.petAction(uuid, "Equip");
+
 				break;
 			}
 			case "Trash Mode":
