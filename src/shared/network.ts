@@ -13,7 +13,7 @@ interface ServerEvents {
 }
 
 interface ServerFunctions {
-	getData: <k extends keyof PlayerData>(data: k) => PlayerData[k] | false;
+	getInitialState: () => PlayerData | undefined;
 }
 
 interface ClientEvents {

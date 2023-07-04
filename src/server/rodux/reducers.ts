@@ -44,19 +44,19 @@ export function updateSetting(state: DataState, action: WithDefaultAction<Update
 }
 
 export function givePet(state: DataState, action: WithDefaultAction<GivePetAction>): DataState {
-	state[action.meta.playerId].petInventory[action.meta.playerId] = action.pet;
+	state[action.meta.playerId].petInventory[action.pet.uuid] = action.pet;
 	return state;
 }
 
 export function updatePet(state: DataState, action: WithDefaultAction<UpdatePetAction>): DataState {
-	const pet = state[action.meta.playerId].petInventory[action.meta.playerId];
+	const pet = state[action.meta.playerId].petInventory[action.uuid];
 	if (!pet) return state;
 
 	if (action.equipped !== undefined) pet.equipped = action.equipped;
 	if (action.locked !== undefined) pet.locked = action.locked;
 
 	if (action.delete) {
-		state[action.meta.playerId].petInventory[action.meta.playerId] = undefined as never as PetInstance;
+		state[action.uuid].petInventory[action.uuid] = undefined as never as PetInstance;
 	}
 
 	return state;

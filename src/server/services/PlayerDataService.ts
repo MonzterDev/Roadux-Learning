@@ -9,7 +9,7 @@ import { PlayerData } from "shared/types/PlayerData";
 import { PlayerDataKeys } from "shared/types/Rodux";
 import { forEveryPlayer } from "shared/util/functions/forEveryPlayer";
 
-const DATASTORE_NAME = "PlayerData";
+const DATASTORE_NAME = "PlayerData2";
 const KEY_TEMPLATE = "%d_Data";
 
 @Service()
@@ -23,9 +23,9 @@ export class PlayerDataService implements OnInit {
 			(player) => this.removeProfile(player),
 		);
 
-		Functions.getData.setCallback((player, data) => {
+		Functions.getInitialState.setCallback((player) => {
 			const profile = this.profiles.get(player);
-			return profile?.Data?.[data] ?? false;
+			return profile?.Data;
 		});
 
 		task.spawn(() => {
@@ -63,5 +63,9 @@ export class PlayerDataService implements OnInit {
 		const profile = this.profiles.get(player);
 		profile?.Release();
 		serverStore.dispatch({ type: PlayerDataKeys.removePlayer, meta: { playerId: player.UserId } });
+	}
+
+	public getProfile(player: Player) {
+		return this.profiles.get(player);
 	}
 }

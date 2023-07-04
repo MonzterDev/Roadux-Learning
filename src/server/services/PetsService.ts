@@ -68,6 +68,7 @@ export class PetsService implements OnStart {
 			equipped: true,
 			meta: { playerId: player.UserId },
 		});
+		print("Pet Equipped", getPlayerData(player).petInventory[uuid]);
 	}
 
 	private unequipPet(player: Player, uuid: string) {
