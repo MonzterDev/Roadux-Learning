@@ -1,21 +1,19 @@
 import { Action, createReducer } from "@rbxts/rodux";
 import { PlayerData } from "shared/types/PlayerData";
 import { DEFAULT_PLAYER_DATA } from "shared/constants/PlayerData";
-import { PlayerDataKeys } from "shared/types/Rodux";
-import { Setting } from "shared/constants/Settings";
+import {
+	AddPlayerAction,
+	GivePetAction,
+	PlayerDataKeys,
+	RenamePetAction,
+	UpdateCurrencyAction,
+	UpdatePetAction,
+	UpdateSettingAction,
+} from "shared/types/Rodux";
 import { Pet, PetInstance, Rarity } from "shared/constants/Pets";
 
-interface UpdateDataAction extends Action<PlayerDataKeys.init> {
-	data: DataState;
-}
-
-export function init(state: DataState, action: UpdateDataAction): DataState {
+export function addPlayer(state: DataState, action: AddPlayerAction): DataState {
 	return action.data;
-}
-
-interface UpdateCurrencyAction extends Action<PlayerDataKeys.updateCurrency> {
-	amount: number;
-	currency: ExtractKeys<PlayerData, number>;
 }
 
 export function updateCurrency(state: DataState, action: UpdateCurrencyAction): DataState {
@@ -23,42 +21,15 @@ export function updateCurrency(state: DataState, action: UpdateCurrencyAction): 
 	return state;
 }
 
-export interface UpdateSettingAction extends Action<PlayerDataKeys.updateSetting> {
-	setting: Setting;
-	value: boolean;
-}
-
 export function updateSetting(state: DataState, action: UpdateSettingAction): DataState {
 	state.settings[action.setting] = action.value;
 	return state;
 }
 
-export interface GivePetAction extends Action<PlayerDataKeys.givePet> {
-	pet: Pet;
-	rarity: Rarity;
-	uuid: string;
-}
-
 export function givePet(state: DataState, action: GivePetAction): DataState {
-	const petInstance: PetInstance = {
-		uuid: action.uuid,
-		type: action.pet,
-		name: action.pet,
-		rarity: action.rarity,
-		equipped: false,
-		locked: false,
-	};
-
-	state.petInventory[action.uuid] = petInstance;
-
+	const petInstance = action.pet;
+	state.petInventory[petInstance.uuid] = petInstance;
 	return state;
-}
-
-export interface UpdatePetAction extends Action<PlayerDataKeys.updatePet> {
-	uuid: string;
-	equipped?: boolean;
-	locked?: boolean;
-	delete?: boolean;
 }
 
 export function updatePet(state: DataState, action: UpdatePetAction): DataState {
@@ -75,11 +46,6 @@ export function updatePet(state: DataState, action: UpdatePetAction): DataState 
 	return state;
 }
 
-export interface RenamePetAction extends Action<PlayerDataKeys.renamePet> {
-	uuid: string;
-	name: string;
-}
-
 export function renamePet(state: DataState, action: RenamePetAction): DataState {
 	const pet = state.petInventory[action.uuid];
 	if (!pet) return state;
@@ -91,7 +57,7 @@ export function renamePet(state: DataState, action: RenamePetAction): DataState 
 
 export type DataState = PlayerData;
 export type DataActions =
-	| UpdateDataAction
+	| AddPlayerAction
 	| UpdateCurrencyAction
 	| UpdateSettingAction
 	| UpdatePetAction
@@ -99,7 +65,7 @@ export type DataActions =
 	| RenamePetAction;
 
 export const dataReducer = createReducer<DataState, DataActions>(DEFAULT_PLAYER_DATA, {
-	init,
+	addPlayer,
 	updateCurrency,
 	updateSetting,
 	updatePet,

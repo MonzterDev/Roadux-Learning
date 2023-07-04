@@ -4,11 +4,10 @@ import Roact from "@rbxts/roact";
 import { withHookDetection } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
 import { Players } from "@rbxts/services";
-import { UpdateSettingAction } from "client/rodux/reducers";
 import { clientStore } from "client/rodux/rodux";
 import { SettingsApp } from "client/ui/apps/Settings";
 import { Setting } from "shared/constants/Settings";
-import { PlayerDataKeys } from "shared/types/Rodux";
+import { PlayerDataKeys, UpdateSettingAction } from "shared/types/Rodux";
 
 @Controller({})
 export class SettingsController implements OnStart {

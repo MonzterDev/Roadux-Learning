@@ -3,7 +3,7 @@ import Roact from "@rbxts/roact";
 import RoactRodux from "@rbxts/roact-rodux";
 import Rodux from "@rbxts/rodux";
 import { SettingsController } from "client/controllers/SettingsController";
-import { PlayerState, UpdateSettingAction } from "client/rodux/reducers";
+import { PlayerState } from "client/rodux/reducers";
 import { Setting } from "shared/constants/Settings";
 
 // Uses roact-rodux

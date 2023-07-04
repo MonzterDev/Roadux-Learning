@@ -1,6 +1,7 @@
 import { Networking } from "@flamework/networking";
 import { PlayerData } from "./types/PlayerData";
 import { PetAction, PetInstance } from "./constants/Pets";
+import { AddPlayerAction } from "./types/Rodux";
 
 interface ServerEvents {
 	equipPet: (uuid: string) => void;
@@ -23,6 +24,8 @@ interface ClientEvents {
 	givePet: (pet: PetInstance) => void;
 	petAction: (uuid: string, action: PetAction) => void;
 	renamePet: (uuid: string, name: string) => void;
+
+	updateState(action: any): void;
 }
 
 interface ClientFunctions {}

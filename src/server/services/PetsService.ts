@@ -4,6 +4,8 @@ import { HttpService, Players, TextService } from "@rbxts/services";
 import { Events } from "server/network";
 import { PetInstance } from "shared/constants/Pets";
 import { PlayerDataService } from "./PlayerDataService";
+import { getPlayerData, serverStore } from "server/rodux/rodux";
+import { PlayerDataKeys } from "shared/types/Rodux";
 
 @Service({})
 export class PetsService implements OnStart {
@@ -51,77 +53,86 @@ export class PetsService implements OnStart {
 			locked: false,
 		};
 
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
-
-		profile.data.petInventory[pet.uuid] = pet;
-		Events.givePet(player, pet);
+		serverStore.dispatch({ type: PlayerDataKeys.givePet, pet: pet, meta: { playerId: player.UserId } });
 	}
 
 	private equipPet(player: Player, uuid: string) {
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		const pet = profile.data.petInventory[uuid];
+		const pet = playerData.petInventory[uuid];
 		if (!pet) return;
 
-		pet.equipped = true;
-		Events.petAction(player, uuid, "Equip");
+		serverStore.dispatch({
+			type: PlayerDataKeys.updatePet,
+			uuid: uuid,
+			equipped: true,
+			meta: { playerId: player.UserId },
+		});
 	}
 
 	private unequipPet(player: Player, uuid: string) {
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		const pet = profile.data.petInventory[uuid];
+		const pet = playerData.petInventory[uuid];
 		if (!pet) return;
 
-		pet.equipped = false;
-		Events.petAction(player, uuid, "Unequip");
+		serverStore.dispatch({
+			type: PlayerDataKeys.updatePet,
+			uuid: uuid,
+			equipped: false,
+			meta: { playerId: player.UserId },
+		});
 	}
 
 	private deletePet(player: Player, uuid: string) {
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		const pet = profile.data.petInventory[uuid];
+		const pet = playerData.petInventory[uuid];
 		if (!pet) return;
-
 		if (pet.locked) return;
 
-		profile.data.petInventory[uuid] = undefined as never as PetInstance;
-		Events.petAction(player, uuid, "Delete");
+		serverStore.dispatch({
+			type: PlayerDataKeys.updatePet,
+			uuid: uuid,
+			delete: true,
+			meta: { playerId: player.UserId },
+		});
 	}
 
 	private lockPet(player: Player, uuid: string) {
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		const pet = profile.data.petInventory[uuid];
+		const pet = playerData.petInventory[uuid];
 		if (!pet) return;
 
-		pet.locked = true;
-		Events.petAction(player, uuid, "Lock");
+		serverStore.dispatch({
+			type: PlayerDataKeys.updatePet,
+			uuid: uuid,
+			locked: true,
+			meta: { playerId: player.UserId },
+		});
 	}
 
 	private unlockPet(player: Player, uuid: string) {
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		const pet = profile.data.petInventory[uuid];
+		const pet = playerData.petInventory[uuid];
 		if (!pet) return;
 
-		pet.locked = false;
-		Events.petAction(player, uuid, "Unlock");
+		serverStore.dispatch({
+			type: PlayerDataKeys.updatePet,
+			uuid: uuid,
+			locked: false,
+			meta: { playerId: player.UserId },
+		});
 	}
 
 	private renamePet(player: Player, uuid: string, name: string) {
 		if (name.size() <= 1 && name.size() > 25) return;
 
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		const pet = profile.data.petInventory[uuid];
+		const pet = playerData.petInventory[uuid];
 		if (!pet) return;
 
 		const filteredName = TextService.FilterStringAsync(
@@ -129,14 +140,18 @@ export class PetsService implements OnStart {
 			player.UserId,
 			Enum.TextFilterContext.PublicChat,
 		).GetNonChatStringForBroadcastAsync();
-		pet.name = filteredName;
-		Events.renamePet(player, uuid, name);
+
+		serverStore.dispatch({
+			type: PlayerDataKeys.renamePet,
+			uuid: uuid,
+			name: filteredName,
+			meta: { playerId: player.UserId },
+		});
 	}
 
 	private deleteAllPets(player: Player) {
-		const profile = this.playerDataService.getProfile(player);
-		if (!profile) return;
+		const playerData = getPlayerData(player);
 
-		for (const [uuid, instance] of pairs(profile.data.petInventory)) this.deletePet(player, uuid);
+		for (const [uuid, instance] of pairs(playerData.petInventory)) this.deletePet(player, uuid);
 	}
 }

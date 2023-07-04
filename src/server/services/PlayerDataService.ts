@@ -3,8 +3,10 @@ import ProfileService from "@rbxts/profileservice";
 import { Profile } from "@rbxts/profileservice/globals";
 import { HttpService, Players } from "@rbxts/services";
 import { Events, Functions } from "server/network";
+import { serverStore } from "server/rodux/rodux";
 import { DEFAULT_PLAYER_DATA } from "shared/constants/PlayerData";
 import { PlayerData } from "shared/types/PlayerData";
+import { PlayerDataKeys } from "shared/types/Rodux";
 import { forEveryPlayer } from "shared/util/functions/forEveryPlayer";
 
 const DATASTORE_NAME = "PlayerData";
@@ -54,40 +56,12 @@ export class PlayerDataService implements OnInit {
 		profile.Reconcile();
 
 		this.profiles.set(player, profile);
+		serverStore.dispatch({ type: PlayerDataKeys.addPlayer, data: profile.Data, meta: { playerId: userId } });
 	}
 
 	private removeProfile(player: Player) {
 		const profile = this.profiles.get(player);
 		profile?.Release();
-	}
-
-	public getProfile(player: Player) {
-		const profile = this.profiles.get(player);
-
-		if (profile) {
-			const setTaps = (value: number) => {
-				profile.Data.taps = value;
-				const action = HttpService.JSONEncode({
-					type: "updateCurrency",
-					currency: "taps",
-					amount: value,
-				});
-				Events.replicatePlayerState(player, action);
-				Events.updateTaps(player, value);
-			};
-
-			const adjustTaps = (value: number) => {
-				const amount = profile.Data.taps + value;
-				setTaps(amount);
-			};
-
-			return {
-				data: profile.Data,
-				setTaps: setTaps,
-				adjustTaps: adjustTaps,
-			};
-		}
-
-		return false;
+		serverStore.dispatch({ type: PlayerDataKeys.removePlayer, meta: { playerId: player.UserId } });
 	}
 }
