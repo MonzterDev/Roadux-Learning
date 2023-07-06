@@ -19,7 +19,7 @@ export interface AddPlayerAction extends Action<PlayerDataKeys.addPlayer> {
 
 export interface UpdateCurrencyAction extends Action<PlayerDataKeys.updateCurrency> {
 	amount: number;
-	currency: ExtractKeys<PlayerData, number>;
+	currency: keyof PlayerData["currency"];
 }
 
 export interface UpdateSettingAction extends Action<PlayerDataKeys.updateSetting> {

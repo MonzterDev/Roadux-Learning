@@ -1,23 +1,25 @@
-import Rodux, { Store, combineReducers, loggerMiddleware } from "@rbxts/rodux";
-import { DefaultAction, dataReducer } from "./reducers";
+import Rodux, { Action, AnyAction, Store, combineReducers, loggerMiddleware } from "@rbxts/rodux";
+import { DefaultAction } from "./reducers";
 import { Events } from "server/network";
 import { Players } from "@rbxts/services";
 import { Dependency } from "@flamework/core";
 import { PlayerDataService } from "server/services/PlayerDataService";
 import Object from "@rbxts/object-utils";
-import { PetInventoryState, petsDataReducer } from "./reducers/pets";
+import { PetInventoryState, petsDataReducer } from "./reducers/petsInventory";
 import { Setting } from "shared/constants/Settings";
 import { PetAction, PetInstance } from "shared/constants/Pets";
-import { SettingState, settingsReducer } from "./reducers/settings";
+import { SettingActions, SettingState, settingsReducer } from "./reducers/settings";
+import { PlayerDataKeys } from "shared/types/Rodux";
+import { CurrencyActions, currencyReducer } from "./reducers/currency";
 
 function replicationMiddleware(nextDispatch: (action: any) => void) {
 	return (action: DefaultAction) => {
-		nextDispatch(action);
+		nextDispatch(action as any);
 
 		const cleanedAction = {};
 		for (const [key, value] of pairs(action)) {
 			if (key !== "meta") {
-				cleanedAction[key] = action[key];
+				cleanedAction[key] = action[key as never];
 			}
 		}
 
@@ -39,10 +41,14 @@ function profileServiceMiddleware(nextDispatch: (action: any) => void) {
 	return (action: DefaultAction) => {
 		const oldState = serverStore.getState();
 		nextDispatch(action);
+
+		if (!oldState) return;
+
 		const newState = serverStore.getState();
 
 		const playerDataService = Dependency(PlayerDataService);
 
+		action.meta.playerId;
 		const player = Players.GetPlayerByUserId(action.meta.playerId);
 		if (!player) return;
 
@@ -54,6 +60,9 @@ function profileServiceMiddleware(nextDispatch: (action: any) => void) {
 		for (const key of Object.keys(newState)) {
 			const oldData = oldState[key][action.meta.playerId];
 			const newData = newState[key][action.meta.playerId];
+
+			if (!oldData || !newData) continue;
+
 			switch (key) {
 				// case "currencies":
 				// 	{
@@ -93,29 +102,20 @@ function profileServiceMiddleware(nextDispatch: (action: any) => void) {
 
 export type RootReducer = typeof rootReducer;
 export type RootStore = Rodux.Store<RootState, Rodux.Action>;
-export interface RootState {
-	settings: SettingState;
-	petInventory: PetInventoryState;
-}
+export type RootState = ReturnType<RootReducer>;
 
-// export interface DataState {
-// 	currencies: Record<string, Record<"taps" | "gems", number>>;
-// 	settings: Record<string, Record<Setting, boolean>>;
-// 	petInventory: Record<string, Record<string, PetInstance>>;
-// }
-
-type DataActions = PetAction;
+export type DataActions = PetAction | SettingActions | CurrencyActions;
 
 const rootReducer = Rodux.combineReducers({
 	petInventory: petsDataReducer,
 	settings: settingsReducer,
-	dataReducer: dataReducer,
+	currency: currencyReducer,
 });
 
 export const serverStore = new Store(
 	rootReducer,
 	{
-		// currencies: {},
+		currency: {},
 		settings: {},
 		petInventory: {},
 	},

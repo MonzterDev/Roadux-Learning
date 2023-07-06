@@ -9,7 +9,7 @@ import { PlayerData } from "shared/types/PlayerData";
 import { PlayerDataKeys } from "shared/types/Rodux";
 import { forEveryPlayer } from "shared/util/functions/forEveryPlayer";
 
-const DATASTORE_NAME = "PlayerData2";
+const DATASTORE_NAME = "PlayerData3";
 const KEY_TEMPLATE = "%d_Data";
 
 @Service()

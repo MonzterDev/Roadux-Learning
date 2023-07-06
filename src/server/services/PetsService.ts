@@ -4,7 +4,7 @@ import { HttpService, Players, TextService } from "@rbxts/services";
 import { Events } from "server/network";
 import { PetInstance } from "shared/constants/Pets";
 import { PlayerDataService } from "./PlayerDataService";
-import { getPlayerData, serverStore } from "server/rodux/rodux";
+import { serverStore } from "server/rodux/rodux";
 import { PlayerDataKeys } from "shared/types/Rodux";
 
 @Service({})
@@ -68,13 +68,13 @@ export class PetsService implements OnStart {
 			equipped: true,
 			meta: { playerId: player.UserId },
 		});
-		print("Pet Equipped", getPlayerData(player).petInventory[uuid]);
+		print("Pet Equipped", serverStore.getState().petInventory[player.UserId]);
 	}
 
 	private unequipPet(player: Player, uuid: string) {
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
-		const pet = playerData.petInventory[uuid];
+		const pet = playerData[uuid];
 		if (!pet) return;
 
 		serverStore.dispatch({
@@ -86,9 +86,9 @@ export class PetsService implements OnStart {
 	}
 
 	private deletePet(player: Player, uuid: string) {
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
-		const pet = playerData.petInventory[uuid];
+		const pet = playerData[uuid];
 		if (!pet) return;
 		if (pet.locked) return;
 
@@ -101,9 +101,9 @@ export class PetsService implements OnStart {
 	}
 
 	private lockPet(player: Player, uuid: string) {
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
-		const pet = playerData.petInventory[uuid];
+		const pet = playerData[uuid];
 		if (!pet) return;
 
 		serverStore.dispatch({
@@ -115,9 +115,9 @@ export class PetsService implements OnStart {
 	}
 
 	private unlockPet(player: Player, uuid: string) {
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
-		const pet = playerData.petInventory[uuid];
+		const pet = playerData[uuid];
 		if (!pet) return;
 
 		serverStore.dispatch({
@@ -131,9 +131,9 @@ export class PetsService implements OnStart {
 	private renamePet(player: Player, uuid: string, name: string) {
 		if (name.size() <= 1 && name.size() > 25) return;
 
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
-		const pet = playerData.petInventory[uuid];
+		const pet = playerData[uuid];
 		if (!pet) return;
 
 		const filteredName = TextService.FilterStringAsync(
@@ -151,7 +151,7 @@ export class PetsService implements OnStart {
 	}
 
 	private deleteAllPets(player: Player) {
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
 		for (const [uuid, instance] of pairs(playerData.petInventory)) this.deletePet(player, uuid);
 	}
