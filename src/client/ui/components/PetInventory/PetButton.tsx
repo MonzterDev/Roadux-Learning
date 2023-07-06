@@ -18,6 +18,7 @@ interface Props {
 
 function PetButton(props: Props) {
 	const petState = useSelector((state: PlayerState) => state.petInventory[props.uuid]);
+	if (!petState) return undefined;
 
 	const viewportRef = Roact.createRef<ViewportFrame>();
 
@@ -64,17 +65,7 @@ function PetButton(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.687, 0)}
 				Size={new UDim2(0.9, 0, 0.313, 0)}
-				Text={tostring(
-					getPetClicks(
-						createPetInstance({
-							uuid: props.uuid,
-							type: petState.type,
-							name: petState.name,
-							rarity: petState.rarity,
-							equipped: petState.equipped,
-						}),
-					),
-				)}
+				Text={tostring(getPetClicks(petState))}
 				TextColor3={Color3.fromRGB(255, 255, 127)}
 				TextScaled={true}
 				TextSize={14}

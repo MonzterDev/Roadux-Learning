@@ -86,6 +86,7 @@ export class PetsService implements OnStart {
 	}
 
 	private deletePet(player: Player, uuid: string) {
+		print("deleting pet");
 		const playerData = serverStore.getState().petInventory[player.UserId];
 
 		const pet = playerData[uuid];
