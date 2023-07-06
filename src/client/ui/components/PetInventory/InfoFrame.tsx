@@ -8,9 +8,6 @@ import { PlayerState } from "client/rodux/reducers";
 import { GetPetModel, Pet, Rarity, createPetInstance, getPetClicks } from "shared/constants/Pets";
 
 interface Props {
-	pet: Pet;
-	name: string;
-	rarity: Rarity;
 	uuid: string;
 }
 
@@ -25,15 +22,15 @@ function PetInfoFrame(props: Props) {
 	const renameTextBoxRef = Roact.createRef<TextBox>();
 
 	const instance = createPetInstance({
-		name: props.name,
-		type: props.pet,
+		name: petState.name,
+		type: petState.type,
 		uuid: props.uuid,
-		rarity: props.rarity,
+		rarity: petState.rarity,
 		equipped: petState.equipped,
 		locked: petState.locked,
 	});
 
-	const model = GetPetModel(props.pet);
+	const model = GetPetModel(petState.type);
 
 	// Have to use this because we can't use the hook before it is set
 	useEffect(() => {
@@ -51,7 +48,7 @@ function PetInfoFrame(props: Props) {
 			BackgroundColor3={Color3.fromRGB(52, 126, 195)}
 			Position={new UDim2(0.187, 0, 0.03, 0)}
 			Size={new UDim2(0.342, 0, 0.8240000000000001, 0)}
-			Visible={props.pet !== undefined}
+			Visible={petState.type !== undefined}
 			Ref={infoFrameRef}
 		>
 			<textlabel
@@ -61,7 +58,7 @@ function PetInfoFrame(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.021, 0)}
 				Size={new UDim2(0.9, 0, 0.067, 0)}
-				Text={props.name}
+				Text={petState.name}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextScaled={true}
 				TextSize={14}

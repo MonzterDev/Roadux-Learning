@@ -23,7 +23,6 @@ function PetButton(props: Props) {
 
 	const model = GetPetModel(petState.type);
 
-	// Have to use this because we can't use the hook before it is set
 	useEffect(() => {
 		const viewport = viewportRef.getValue();
 		if (!viewport?.FindFirstChildOfClass("Model")) {

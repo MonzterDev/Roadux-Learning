@@ -181,14 +181,7 @@ function PetFrame(props: Props) {
 						SortOrder={Enum.SortOrder.LayoutOrder}
 					/>
 				</scrollingframe>
-				{!isTrashMode && selectedPet && (
-					<PetInfoFrame
-						pet={selectedPet.type}
-						uuid={selectedPet.uuid}
-						name={selectedPet.name}
-						rarity={selectedPet.rarity}
-					/>
-				)}
+				{!isTrashMode && selectedPet && <PetInfoFrame uuid={selectedPet.uuid} />}
 			</frame>
 			<textbutton
 				Key="Exit"
