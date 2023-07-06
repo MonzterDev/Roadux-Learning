@@ -1,5 +1,6 @@
 import Roact from "@rbxts/roact";
-import { useEffect, withHooks } from "@rbxts/roact-hooked";
+import { useEffect } from "@rbxts/roact-hooked";
+import RoactRodux from "@rbxts/roact-rodux";
 import { useSelector } from "@rbxts/roact-rodux-hooked";
 import Rodux from "@rbxts/rodux";
 import { GenerateViewport } from "@rbxts/viewport-model";
@@ -11,7 +12,6 @@ interface Props {
 
 	selectedToDelete: boolean;
 
-	visible: boolean;
 	layoutOrder: number;
 
 	onClick: () => void;
@@ -30,7 +30,7 @@ function PetButton(props: Props) {
 		if (!viewport?.FindFirstChildOfClass("Model")) {
 			GenerateViewport(viewportRef.getValue()!, model.Clone());
 		}
-	});
+	}, []);
 
 	return (
 		<textbutton
@@ -41,7 +41,6 @@ function PetButton(props: Props) {
 			Text={""}
 			TextColor3={Color3.fromRGB(0, 0, 0)}
 			TextSize={14}
-			Visible={props.visible}
 			Event={{ MouseButton1Click: props.onClick }}
 			LayoutOrder={props.layoutOrder}
 		>
@@ -119,4 +118,13 @@ function PetButton(props: Props) {
 	);
 }
 
-export default withHooks(PetButton);
+function mapState(state: PlayerState, props: Props) {
+	const pet = state.petInventory[props.uuid];
+	return {
+		equipped: pet.equipped ?? false,
+	};
+}
+
+function mapDispatch(dispatch: Rodux.Dispatch) {}
+
+export default RoactRodux.connect(mapState, mapDispatch)(PetButton);

@@ -12,7 +12,6 @@ export class PetsController implements OnStart {
 	private playerGui = this.player.WaitForChild("PlayerGui", 5);
 
 	onStart() {
-		withHookDetection(Roact);
 		const handle = mount(
 			createElement(PetInventory, {
 				onClick: () => {

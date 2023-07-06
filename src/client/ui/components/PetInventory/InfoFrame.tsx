@@ -1,5 +1,6 @@
 import Roact from "@rbxts/roact";
-import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
+import { useEffect, useState } from "@rbxts/roact-hooked";
+import RoactRodux from "@rbxts/roact-rodux";
 import { useSelector } from "@rbxts/roact-rodux-hooked";
 import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
@@ -15,8 +16,7 @@ interface Props {
 }
 
 function PetInfoFrame(props: Props) {
-	const isEquipped = useSelector((state: PlayerState) => state.petInventory[props.uuid]?.equipped ?? false);
-	const isLocked = useSelector((state: PlayerState) => state.petInventory[props.uuid]?.locked ?? false);
+	const petState = useSelector((state: PlayerState) => state.petInventory[props.uuid]);
 
 	const [isRenaming, setIsRenaming] = useState(false);
 
@@ -30,8 +30,8 @@ function PetInfoFrame(props: Props) {
 		type: props.pet,
 		uuid: props.uuid,
 		rarity: props.rarity,
-		equipped: isEquipped,
-		locked: isLocked,
+		equipped: petState.equipped,
+		locked: petState.locked,
 	});
 
 	const model = GetPetModel(props.pet);
@@ -43,7 +43,7 @@ function PetInfoFrame(props: Props) {
 			CleanViewport(viewport);
 			GenerateViewport(viewport, model.Clone());
 		}
-	});
+	}, []);
 
 	return (
 		<frame
@@ -107,13 +107,13 @@ function PetInfoFrame(props: Props) {
 				<imagebutton
 					Key="Lock"
 					BackgroundTransparency={1}
-					Image={isLocked ? "rbxassetid://12012052569" : "rbxassetid://12359088245"}
+					Image={petState.locked ? "rbxassetid://12012052569" : "rbxassetid://12359088245"}
 					Position={new UDim2(0.05, 0, 0.55, 0)}
 					ScaleType={Enum.ScaleType.Fit}
 					Size={new UDim2(0.15, 0, 0.4, 0)}
 					Event={{
 						MouseButton1Click: () => {
-							Events.petAction(props.uuid, isLocked ? "Unlock" : "Lock");
+							Events.petAction(props.uuid, petState.locked ? "Unlock" : "Lock");
 						},
 					}}
 				/>
@@ -271,14 +271,14 @@ function PetInfoFrame(props: Props) {
 					BackgroundColor3={Color3.fromRGB(156, 98, 255)}
 					Font={Enum.Font.GothamBold}
 					Size={new UDim2(0, 200, 0, 50)}
-					Text={isEquipped ? "Unequip" : "Equip"}
+					Text={petState.equipped ? "Unequip" : "Equip"}
 					TextColor3={Color3.fromRGB(255, 255, 255)}
 					TextScaled={true}
 					TextSize={14}
 					TextWrapped={true}
 					Event={{
 						MouseButton1Click: () => {
-							if (isEquipped) Events.petAction(props.uuid, "Unequip");
+							if (petState.equipped) Events.petAction(props.uuid, "Unequip");
 							else Events.petAction(props.uuid, "Equip");
 						},
 					}}
@@ -310,7 +310,7 @@ function PetInfoFrame(props: Props) {
 					TextWrapped={true}
 					Event={{
 						MouseButton1Click: () => {
-							if (!isLocked) Events.petAction(props.uuid, "Delete");
+							if (!petState.locked) Events.petAction(props.uuid, "Delete");
 						},
 					}}
 				>
@@ -321,4 +321,19 @@ function PetInfoFrame(props: Props) {
 	);
 }
 
-export default withHooks(PetInfoFrame);
+function mapState(state: PlayerState, props: Props) {
+	const pet = state.petInventory[props.uuid];
+	if (!pet)
+		return {
+			equipped: false,
+			locked: false,
+		};
+	return {
+		equipped: pet.equipped ?? false,
+		locked: pet.locked ?? false,
+	};
+}
+
+function mapDispatch(dispatch: Rodux.Dispatch) {}
+
+export default RoactRodux.connect(mapState, mapDispatch)(PetInfoFrame);
