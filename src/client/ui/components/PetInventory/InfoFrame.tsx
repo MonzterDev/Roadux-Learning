@@ -1,10 +1,6 @@
 import Roact from "@rbxts/roact";
 import { useEffect, useState } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
-<<<<<<< HEAD
-import { useSelector } from "@rbxts/roact-rodux-hooked";
-=======
->>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
 import { Events } from "client/network";
@@ -21,13 +17,8 @@ interface Props {
 }
 
 function PetInfoFrame(props: Props) {
-<<<<<<< HEAD
-	const petState = useSelector((state: PlayerState) => state.petInventory[props.uuid]);
-
-=======
 	const isEquipped = props.equipped;
 	const isLocked = props.locked;
->>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 	const [isRenaming, setIsRenaming] = useState(false);
 
 	const infoFrameRef = Roact.createRef<Frame>();
@@ -40,13 +31,8 @@ function PetInfoFrame(props: Props) {
 		type: props.pet,
 		uuid: props.uuid,
 		rarity: props.rarity,
-<<<<<<< HEAD
-		equipped: petState.equipped,
-		locked: petState.locked,
-=======
 		equipped: props.equipped,
 		locked: props.locked,
->>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 	});
 
 	const model = GetPetModel(props.pet);
@@ -58,7 +44,7 @@ function PetInfoFrame(props: Props) {
 			CleanViewport(viewport);
 			GenerateViewport(viewport, model.Clone());
 		}
-	}, []);
+	}, [viewportRef]);
 
 	return (
 		<frame
@@ -122,13 +108,13 @@ function PetInfoFrame(props: Props) {
 				<imagebutton
 					Key="Lock"
 					BackgroundTransparency={1}
-					Image={petState.locked ? "rbxassetid://12012052569" : "rbxassetid://12359088245"}
+					Image={props.locked ? "rbxassetid://12012052569" : "rbxassetid://12359088245"}
 					Position={new UDim2(0.05, 0, 0.55, 0)}
 					ScaleType={Enum.ScaleType.Fit}
 					Size={new UDim2(0.15, 0, 0.4, 0)}
 					Event={{
 						MouseButton1Click: () => {
-							Events.petAction(props.uuid, petState.locked ? "Unlock" : "Lock");
+							Events.petAction(props.uuid, props.locked ? "Unlock" : "Lock");
 						},
 					}}
 				/>
@@ -286,14 +272,14 @@ function PetInfoFrame(props: Props) {
 					BackgroundColor3={Color3.fromRGB(156, 98, 255)}
 					Font={Enum.Font.GothamBold}
 					Size={new UDim2(0, 200, 0, 50)}
-					Text={petState.equipped ? "Unequip" : "Equip"}
+					Text={props.equipped ? "Unequip" : "Equip"}
 					TextColor3={Color3.fromRGB(255, 255, 255)}
 					TextScaled={true}
 					TextSize={14}
 					TextWrapped={true}
 					Event={{
 						MouseButton1Click: () => {
-							if (petState.equipped) Events.petAction(props.uuid, "Unequip");
+							if (props.equipped) Events.petAction(props.uuid, "Unequip");
 							else Events.petAction(props.uuid, "Equip");
 						},
 					}}
@@ -325,7 +311,7 @@ function PetInfoFrame(props: Props) {
 					TextWrapped={true}
 					Event={{
 						MouseButton1Click: () => {
-							if (!petState.locked) Events.petAction(props.uuid, "Delete");
+							if (!props.locked) Events.petAction(props.uuid, "Delete");
 						},
 					}}
 				>

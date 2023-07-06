@@ -56,7 +56,7 @@ export function updatePet(state: DataState, action: WithDefaultAction<UpdatePetA
 	if (action.locked !== undefined) pet.locked = action.locked;
 
 	if (action.delete) {
-		state[action.uuid].petInventory[action.uuid] = undefined as never as PetInstance;
+		state[action.meta.playerId].petInventory[action.uuid] = undefined as never as PetInstance;
 	}
 
 	return state;

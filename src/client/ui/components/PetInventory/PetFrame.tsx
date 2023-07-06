@@ -55,6 +55,9 @@ function PetFrame(props: Props) {
 				<PetButton
 					Key={pet.uuid}
 					uuid={pet.uuid}
+					rarity={pet.rarity}
+					name={pet.name}
+					pet={pet.type}
 					selectedToDelete={isTrashMode && petsToTrash.includes(pet.uuid)}
 					onClick={() => {
 						if (isTrashMode) {

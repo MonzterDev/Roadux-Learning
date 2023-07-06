@@ -57,11 +57,6 @@ function PetInventory(props: Props) {
 					name={pet.name}
 					rarity={pet.rarity}
 					selectedToDelete={isTrashMode && petsToTrash.includes(pet.uuid)}
-					visible={
-						pet.name.lower().find(searchString.lower())[0] !== undefined ||
-						pet.type.lower().find(searchString.lower())[0] !== undefined ||
-						searchString.lower() === ""
-					}
 					onClick={() => {
 						if (isTrashMode) {
 							if (petsToTrash.includes(pet.uuid)) {

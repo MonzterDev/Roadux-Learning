@@ -13,6 +13,7 @@ export class PetsController implements OnStart {
 	private playerGui = this.player.WaitForChild("PlayerGui", 5);
 
 	onStart() {
+		withHookDetection(Roact);
 		const handle = mount(
 			createElement(RoactRodux.StoreProvider, { store: clientStore }, [
 				createElement(PetInventory, {

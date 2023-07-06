@@ -1,10 +1,7 @@
 import Roact from "@rbxts/roact";
 import { useEffect } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
-<<<<<<< HEAD
 import { useSelector } from "@rbxts/roact-rodux-hooked";
-=======
->>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 import Rodux from "@rbxts/rodux";
 import { GenerateViewport } from "@rbxts/viewport-model";
 import { PlayerState } from "client/rodux/reducers";
@@ -37,7 +34,7 @@ function PetButton(props: Props) {
 		if (!viewport?.FindFirstChildOfClass("Model")) {
 			GenerateViewport(viewportRef.getValue()!, model.Clone());
 		}
-	}, []);
+	}, [viewportRef]);
 
 	return (
 		<textbutton
