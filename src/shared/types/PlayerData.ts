@@ -2,8 +2,10 @@ import { PetInventory } from "shared/constants/Pets";
 import { Setting } from "shared/constants/Settings";
 
 export interface PlayerData {
-	taps: number;
-	gems: number;
+	currency: {
+		taps: number;
+		gems: number;
+	};
 	settings: SettingsData;
 	petInventory: PetInventory;
 }

@@ -10,6 +10,10 @@ import {
 	UpdateSettingAction,
 } from "shared/types/Rodux";
 import { Pet, PetInstance, Rarity } from "shared/constants/Pets";
+import { givePet, renamePet, updatePet } from "./reducers/pets";
+import { Setting } from "shared/constants/Settings";
+import Object from "@rbxts/object-utils";
+import { RootState } from "./rodux";
 
 export interface DefaultAction {
 	meta: {
@@ -19,78 +23,55 @@ export interface DefaultAction {
 	};
 }
 
-type WithDefaultAction<T extends Action<any>> = T & DefaultAction;
+export type WithDefaultAction<T extends Action<any>> = T & DefaultAction;
 
-export function addPlayer(state: DataState, action: WithDefaultAction<AddPlayerAction>): DataState {
-	state[action.meta.playerId] = action.data;
+export function addPlayer(state: RootState, action: WithDefaultAction<AddPlayerAction>): RootState {
+	for (const key of Object.keys(state)) {
+		switch (key) {
+			// case "currencies":
+			// 	state[key][action.meta.playerId] = { taps: action.data.currency.taps, gems: action.data.currency.gems };
+			// 	break;
+			case "settings":
+				state[key][action.meta.playerId] = action.data.settings;
+				break;
+			case "petInventory":
+				state[key][action.meta.playerId] = action.data.petInventory;
+				break;
+		}
+	}
+
+	print(state);
 	return state;
 }
 
 export interface RemovePlayerAction extends DefaultAction, Action<PlayerDataKeys.removePlayer> {}
 
-export function removePlayer(state: DataState, action: RemovePlayerAction): DataState {
-	state[action.meta.playerId] = undefined as never as PlayerData;
-	return state;
-}
-
-export function updateCurrency(state: DataState, action: WithDefaultAction<UpdateCurrencyAction>): DataState {
-	state[action.meta.playerId][action.currency] = action.amount;
-	return state;
-}
-
-export function updateSetting(state: DataState, action: WithDefaultAction<UpdateSettingAction>): DataState {
-	state[action.meta.playerId].settings[action.setting] = action.value;
-	return state;
-}
-
-export function givePet(state: DataState, action: WithDefaultAction<GivePetAction>): DataState {
-	state[action.meta.playerId].petInventory[action.pet.uuid] = action.pet;
-	return state;
-}
-
-export function updatePet(state: DataState, action: WithDefaultAction<UpdatePetAction>): DataState {
-	const pet = state[action.meta.playerId].petInventory[action.uuid];
-	if (!pet) return state;
-
-	if (action.equipped !== undefined) pet.equipped = action.equipped;
-	if (action.locked !== undefined) pet.locked = action.locked;
-
-	if (action.delete) {
-		state[action.uuid].petInventory[action.uuid] = undefined as never as PetInstance;
+export function removePlayer(state: RootState, action: RemovePlayerAction): RootState {
+	for (const key of Object.keys(state)) {
+		state[key][action.meta.playerId] = undefined as any;
 	}
-
 	return state;
 }
 
-export function renamePet(state: DataState, action: WithDefaultAction<RenamePetAction>): DataState {
-	const pet = state[action.meta.playerId].petInventory[action.uuid];
-	if (!pet) return state;
+// export function updateCurrency(state: DataState, action: WithDefaultAction<UpdateCurrencyAction>): DataState {
+// 	state.currencies[action.meta.playerId][action.currency] = action.amount;
+// 	return state;
+// }
 
-	state[action.meta.playerId].petInventory[action.uuid].name = action.name;
+// export interface DataState {
+// 	currencies: Record<string, Record<"taps" | "gems", number>>;
+// 	settings: Record<string, Record<Setting, boolean>>;
+// 	petInventory: Record<string, Record<string, PetInstance>>;
+// }
 
-	return state;
-}
+export type DataActions = WithDefaultAction<AddPlayerAction> | RemovePlayerAction;
 
-export type DataState = Record<string, PlayerData>;
-export type DataActions =
-	| WithDefaultAction<AddPlayerAction>
-	| RemovePlayerAction
-	| WithDefaultAction<UpdateCurrencyAction>
-	| WithDefaultAction<UpdateSettingAction>
-	| WithDefaultAction<UpdatePetAction>
-	| WithDefaultAction<GivePetAction>
-	| WithDefaultAction<RenamePetAction>;
-
-export const dataReducer = createReducer<DataState, DataActions>(
-	{},
+export const dataReducer = createReducer<RootState, DataActions>(
+	{ settings: {}, petInventory: {} },
 	{
 		addPlayer: addPlayer,
 		removePlayer: removePlayer,
-		updateCurrency,
-		updateSetting,
-		updatePet,
-		givePet,
-		renamePet,
+		// updateCurrency,
 	},
 );
 export type PlayerState = ReturnType<typeof dataReducer>;

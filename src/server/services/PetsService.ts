@@ -57,9 +57,9 @@ export class PetsService implements OnStart {
 	}
 
 	private equipPet(player: Player, uuid: string) {
-		const playerData = getPlayerData(player);
+		const playerData = serverStore.getState().petInventory[player.UserId];
 
-		const pet = playerData.petInventory[uuid];
+		const pet = playerData[uuid];
 		if (!pet) return;
 
 		serverStore.dispatch({

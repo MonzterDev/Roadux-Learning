@@ -17,7 +17,7 @@ export function addPlayer(state: DataState, action: AddPlayerAction): DataState 
 }
 
 export function updateCurrency(state: DataState, action: UpdateCurrencyAction): DataState {
-	state[action.currency] = action.amount;
+	state.currency[action.currency as keyof typeof state.currency] = action.amount;
 	return state;
 }
 
