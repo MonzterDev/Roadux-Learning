@@ -11,6 +11,9 @@ let isDataLoaded = false;
 Events.updateState.connect((action) => {
 	clientStore.dispatch(action);
 
+	print("updateState", action);
+	print("clientStore", clientStore.getState());
+
 	const isAddPlayerAction = (action as { type: PlayerDataKeys }).type === PlayerDataKeys.addPlayer;
 	if (!isDataLoaded && isAddPlayerAction) isDataLoaded = true;
 });

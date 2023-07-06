@@ -1,7 +1,6 @@
 import { Controller, OnStart } from "@flamework/core";
 import Roact, { createElement, mount, unmount } from "@rbxts/roact";
 import { withHookDetection } from "@rbxts/roact-hooked";
-import RoactRodux from "@rbxts/roact-rodux";
 import { Players } from "@rbxts/services";
 import { clientStore } from "client/rodux/rodux";
 import PetInventory from "client/ui/apps/PetInventory";
@@ -15,13 +14,11 @@ export class PetsController implements OnStart {
 	onStart() {
 		withHookDetection(Roact);
 		const handle = mount(
-			createElement(RoactRodux.StoreProvider, { store: clientStore }, [
-				createElement(PetInventory, {
-					onClick: () => {
-						unmount(handle);
-					},
-				}),
-			]),
+			createElement(PetInventory, {
+				onClick: () => {
+					unmount(handle);
+				},
+			}),
 			this.playerGui,
 		);
 	}

@@ -1,17 +1,13 @@
 import Roact from "@rbxts/roact";
-import { useEffect } from "@rbxts/roact-hooked";
-import RoactRodux from "@rbxts/roact-rodux";
+import { useEffect, withHooks } from "@rbxts/roact-hooked";
+import { useSelector } from "@rbxts/roact-rodux-hooked";
 import Rodux from "@rbxts/rodux";
 import { GenerateViewport } from "@rbxts/viewport-model";
 import { PlayerState } from "client/rodux/reducers";
 import { GetPetModel, Pet, Rarity, createPetInstance, getPetClicks } from "shared/constants/Pets";
 
 interface Props {
-	pet: Pet;
-	name: string;
 	uuid: string;
-	rarity: Rarity;
-	equipped: boolean;
 
 	selectedToDelete: boolean;
 
@@ -22,11 +18,11 @@ interface Props {
 }
 
 function PetButton(props: Props) {
-	const isEquipped = props.equipped;
+	const petState = useSelector((state: PlayerState) => state.petInventory[props.uuid]);
 
 	const viewportRef = Roact.createRef<ViewportFrame>();
 
-	const model = GetPetModel(props.pet);
+	const model = GetPetModel(petState.type);
 
 	// Have to use this because we can't use the hook before it is set
 	useEffect(() => {
@@ -57,7 +53,7 @@ function PetButton(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.021, 0)}
 				Size={new UDim2(0.9, 0, 0.2, 0)}
-				Text={props.name}
+				Text={petState.name}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextScaled={true}
 				TextSize={14}
@@ -75,10 +71,10 @@ function PetButton(props: Props) {
 					getPetClicks(
 						createPetInstance({
 							uuid: props.uuid,
-							type: props.pet,
-							name: props.name,
-							rarity: props.rarity,
-							equipped: isEquipped,
+							type: petState.type,
+							name: petState.name,
+							rarity: petState.rarity,
+							equipped: petState.equipped,
 						}),
 					),
 				)}
@@ -102,7 +98,7 @@ function PetButton(props: Props) {
 				ScaleType={Enum.ScaleType.Fit}
 				Size={new UDim2(0.2, 0, 0.2, 0)}
 				ZIndex={3}
-				Visible={isEquipped}
+				Visible={petState.equipped}
 			/>
 			<textlabel
 				Key="Selected"
@@ -123,13 +119,4 @@ function PetButton(props: Props) {
 	);
 }
 
-function mapState(state: PlayerState, props: Props) {
-	const pet = state.petInventory[props.uuid];
-	return {
-		equipped: pet.equipped ?? false,
-	};
-}
-
-function mapDispatch(dispatch: Rodux.Dispatch) {}
-
-export default RoactRodux.connect(mapState, mapDispatch)(PetButton);
+export default withHooks(PetButton);

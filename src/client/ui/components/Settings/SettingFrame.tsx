@@ -1,9 +1,11 @@
 import Roact from "@rbxts/roact";
-import { useEffect, useState } from "@rbxts/roact-hooked";
+import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
 import { ClientStore, clientStore } from "client/rodux/rodux";
 import { Setting } from "shared/constants/Settings";
 import { Dependency } from "@flamework/core";
 import { SettingsController } from "client/controllers/SettingsController";
+import { useSelector } from "@rbxts/roact-rodux-hooked";
+import { PlayerData } from "shared/types/PlayerData";
 
 // Uses roact-hooked
 
@@ -14,13 +16,9 @@ interface Props {
 function SettingsFrame(props: Props) {
 	const settingsController = Dependency(SettingsController);
 
-	const [isEnabled, setIsEnabled] = useState(() => {
-		const currentState = clientStore.getState();
-		return currentState.settings[props.setting as keyof typeof currentState.settings];
-	});
+	const isEnabled = useSelector((state: PlayerData) => state.settings[props.setting as keyof typeof state.settings]);
 
 	const toggleEnabled = () => {
-		setIsEnabled((action) => !action);
 		settingsController.updateSetting(props.setting, !isEnabled);
 	};
 
@@ -60,4 +58,4 @@ function SettingsFrame(props: Props) {
 	);
 }
 
-export default SettingsFrame;
+export default withHooks(SettingsFrame);

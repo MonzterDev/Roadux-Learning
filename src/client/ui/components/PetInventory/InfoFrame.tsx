@@ -1,6 +1,6 @@
 import Roact from "@rbxts/roact";
-import { useEffect, useState } from "@rbxts/roact-hooked";
-import RoactRodux from "@rbxts/roact-rodux";
+import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
+import { useSelector } from "@rbxts/roact-rodux-hooked";
 import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
 import { Events } from "client/network";
@@ -12,13 +12,12 @@ interface Props {
 	name: string;
 	rarity: Rarity;
 	uuid: string;
-	equipped: boolean;
-	locked: boolean;
 }
 
 function PetInfoFrame(props: Props) {
-	const isEquipped = props.equipped;
-	const isLocked = props.locked;
+	const isEquipped = useSelector((state: PlayerState) => state.petInventory[props.uuid]?.equipped ?? false);
+	const isLocked = useSelector((state: PlayerState) => state.petInventory[props.uuid]?.locked ?? false);
+
 	const [isRenaming, setIsRenaming] = useState(false);
 
 	const infoFrameRef = Roact.createRef<Frame>();
@@ -31,8 +30,8 @@ function PetInfoFrame(props: Props) {
 		type: props.pet,
 		uuid: props.uuid,
 		rarity: props.rarity,
-		equipped: props.equipped,
-		locked: props.locked,
+		equipped: isEquipped,
+		locked: isLocked,
 	});
 
 	const model = GetPetModel(props.pet);
@@ -322,19 +321,4 @@ function PetInfoFrame(props: Props) {
 	);
 }
 
-function mapState(state: PlayerState, props: Props) {
-	const pet = state.petInventory[props.uuid];
-	if (!pet)
-		return {
-			equipped: false,
-			locked: false,
-		};
-	return {
-		equipped: pet.equipped ?? false,
-		locked: pet.locked ?? false,
-	};
-}
-
-function mapDispatch(dispatch: Rodux.Dispatch) {}
-
-export default RoactRodux.connect(mapState, mapDispatch)(PetInfoFrame);
+export default withHooks(PetInfoFrame);
