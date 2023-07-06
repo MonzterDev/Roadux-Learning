@@ -1,7 +1,10 @@
 import Roact from "@rbxts/roact";
 import { useEffect, useState } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
+<<<<<<< HEAD
 import { useSelector } from "@rbxts/roact-rodux-hooked";
+=======
+>>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
 import { Events } from "client/network";
@@ -13,11 +16,18 @@ interface Props {
 	name: string;
 	rarity: Rarity;
 	uuid: string;
+	equipped: boolean;
+	locked: boolean;
 }
 
 function PetInfoFrame(props: Props) {
+<<<<<<< HEAD
 	const petState = useSelector((state: PlayerState) => state.petInventory[props.uuid]);
 
+=======
+	const isEquipped = props.equipped;
+	const isLocked = props.locked;
+>>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 	const [isRenaming, setIsRenaming] = useState(false);
 
 	const infoFrameRef = Roact.createRef<Frame>();
@@ -30,8 +40,13 @@ function PetInfoFrame(props: Props) {
 		type: props.pet,
 		uuid: props.uuid,
 		rarity: props.rarity,
+<<<<<<< HEAD
 		equipped: petState.equipped,
 		locked: petState.locked,
+=======
+		equipped: props.equipped,
+		locked: props.locked,
+>>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 	});
 
 	const model = GetPetModel(props.pet);

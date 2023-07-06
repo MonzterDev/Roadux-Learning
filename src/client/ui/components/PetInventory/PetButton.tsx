@@ -1,14 +1,21 @@
 import Roact from "@rbxts/roact";
 import { useEffect } from "@rbxts/roact-hooked";
 import RoactRodux from "@rbxts/roact-rodux";
+<<<<<<< HEAD
 import { useSelector } from "@rbxts/roact-rodux-hooked";
+=======
+>>>>>>> parent of 9b92c64 (- Tried only using roact-rodux-hooked)
 import Rodux from "@rbxts/rodux";
 import { GenerateViewport } from "@rbxts/viewport-model";
 import { PlayerState } from "client/rodux/reducers";
 import { GetPetModel, Pet, Rarity, createPetInstance, getPetClicks } from "shared/constants/Pets";
 
 interface Props {
+	pet: Pet;
+	name: string;
 	uuid: string;
+	rarity: Rarity;
+	equipped: boolean;
 
 	selectedToDelete: boolean;
 
@@ -18,11 +25,11 @@ interface Props {
 }
 
 function PetButton(props: Props) {
-	const petState = useSelector((state: PlayerState) => state.petInventory[props.uuid]);
+	const isEquipped = props.equipped;
 
 	const viewportRef = Roact.createRef<ViewportFrame>();
 
-	const model = GetPetModel(petState.type);
+	const model = GetPetModel(props.pet);
 
 	// Have to use this because we can't use the hook before it is set
 	useEffect(() => {
@@ -52,7 +59,7 @@ function PetButton(props: Props) {
 				Font={Enum.Font.GothamBold}
 				Position={new UDim2(0.5, 0, 0.021, 0)}
 				Size={new UDim2(0.9, 0, 0.2, 0)}
-				Text={petState.name}
+				Text={props.name}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextScaled={true}
 				TextSize={14}
@@ -70,10 +77,10 @@ function PetButton(props: Props) {
 					getPetClicks(
 						createPetInstance({
 							uuid: props.uuid,
-							type: petState.type,
-							name: petState.name,
-							rarity: petState.rarity,
-							equipped: petState.equipped,
+							type: props.pet,
+							name: props.name,
+							rarity: props.rarity,
+							equipped: isEquipped,
 						}),
 					),
 				)}
@@ -97,7 +104,7 @@ function PetButton(props: Props) {
 				ScaleType={Enum.ScaleType.Fit}
 				Size={new UDim2(0.2, 0, 0.2, 0)}
 				ZIndex={3}
-				Visible={petState.equipped}
+				Visible={isEquipped}
 			/>
 			<textlabel
 				Key="Selected"
