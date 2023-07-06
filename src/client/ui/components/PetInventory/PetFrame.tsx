@@ -26,7 +26,6 @@ interface Props {
 
 function PetFrame(props: Props) {
 	const pets = useSelector((state: PlayerState) => state.petInventory);
-
 	const [isTrashMode, setTrashMode] = useState(false);
 	const [selectedPet, setSelectedPet] = useState<PetInstance>(undefined);
 	const [searchString, setSearchString] = useState<string>("");
@@ -77,7 +76,7 @@ function PetFrame(props: Props) {
 			const petInInventory = clientStore.getState().petInventory[selectedPet.uuid];
 			if (!petInInventory) setSelectedPet(undefined);
 		}
-	}, [pets]);
+	});
 
 	function performAction(action: PetActionButton) {
 		switch (action) {
