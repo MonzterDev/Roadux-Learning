@@ -42,7 +42,7 @@ function PetInfoFrame(props: Props) {
 			CleanViewport(viewport);
 			GenerateViewport(viewport, model.Clone());
 		}
-	}, []);
+	}, [viewportRef, model]);
 
 	return (
 		<frame
