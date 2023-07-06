@@ -1,6 +1,5 @@
 import Roact from "@rbxts/roact";
-import { useEffect, useState } from "@rbxts/roact-hooked";
-import RoactRodux from "@rbxts/roact-rodux";
+import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
 import { useSelector } from "@rbxts/roact-rodux-hooked";
 import Rodux from "@rbxts/rodux";
 import { CleanViewport, GenerateViewport } from "@rbxts/viewport-model";
@@ -113,7 +112,7 @@ function PetInfoFrame(props: Props) {
 					Size={new UDim2(0.15, 0, 0.4, 0)}
 					Event={{
 						MouseButton1Click: () => {
-							Events.petAction(props.uuid, petState.locked ? "Unlock" : "Lock");
+							Events.petAction(props.uuid, isLocked ? "Unlock" : "Lock");
 						},
 					}}
 				/>
@@ -321,19 +320,4 @@ function PetInfoFrame(props: Props) {
 	);
 }
 
-function mapState(state: PlayerState, props: Props) {
-	const pet = state.petInventory[props.uuid];
-	if (!pet)
-		return {
-			equipped: false,
-			locked: false,
-		};
-	return {
-		equipped: pet.equipped ?? false,
-		locked: pet.locked ?? false,
-	};
-}
-
-function mapDispatch(dispatch: Rodux.Dispatch) {}
-
-export default RoactRodux.connect(mapState, mapDispatch)(PetInfoFrame);
+export default withHooks(PetInfoFrame);
