@@ -13,7 +13,7 @@ import {
 	getPetClicks,
 } from "shared/constants/Pets";
 import { Events } from "client/network";
-import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
+import { useEffect, useState, withHooks, withHooksPure } from "@rbxts/roact-hooked";
 import { PlayerState } from "client/rodux/reducers";
 import ActionButton from "./ActionButton";
 import Object from "@rbxts/object-utils";
@@ -26,6 +26,7 @@ interface Props {
 
 function PetFrame(props: Props) {
 	const pets = useSelector((state: PlayerState) => state.petInventory);
+
 	const [isTrashMode, setTrashMode] = useState(false);
 	const [selectedPet, setSelectedPet] = useState<PetInstance>(undefined);
 	const [searchString, setSearchString] = useState<string>("");
@@ -45,28 +46,30 @@ function PetFrame(props: Props) {
 			const bClicks = getPetClicks(b);
 			return aClicks > bClicks;
 		})
-		.map((pet, index) => {
-			return (
+		.mapFiltered((pet, index) => {
+			const isVisible =
+				pet.name.lower().find(searchString.lower())[0] !== undefined ||
+				pet.type.lower().find(searchString.lower())[0] !== undefined ||
+				searchString.lower() === "";
+
+			return isVisible ? (
 				<PetButton
+					Key={pet.uuid}
 					uuid={pet.uuid}
 					selectedToDelete={isTrashMode && petsToTrash.includes(pet.uuid)}
-					visible={
-						pet.name.lower().find(searchString.lower())[0] !== undefined ||
-						pet.type.lower().find(searchString.lower())[0] !== undefined ||
-						searchString.lower() === ""
-					}
 					onClick={() => {
 						if (isTrashMode) {
 							if (petsToTrash.includes(pet.uuid)) {
-								const index = petsToTrash.indexOf(pet.uuid);
-								petsToTrash.remove(index);
-								setPetsToTrash([...petsToTrash]);
+								const newState = [...petsToTrash];
+								const index = newState.indexOf(pet.uuid);
+								newState.remove(index);
+								setPetsToTrash(newState);
 							} else setPetsToTrash([...petsToTrash, pet.uuid]);
 						} else setSelectedPet(pet);
 					}}
 					layoutOrder={index}
 				/>
-			);
+			) : undefined;
 		});
 
 	useEffect(() => {
@@ -74,7 +77,7 @@ function PetFrame(props: Props) {
 			const petInInventory = clientStore.getState().petInventory[selectedPet.uuid];
 			if (!petInInventory) setSelectedPet(undefined);
 		}
-	});
+	}, [pets]);
 
 	function performAction(action: PetActionButton) {
 		switch (action) {
@@ -349,4 +352,4 @@ function PetFrame(props: Props) {
 	);
 }
 
-export default withHooks(PetFrame);
+export default withHooksPure(PetFrame);
